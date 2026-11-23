@@ -7,13 +7,17 @@
   --kemik: #e9e3d8;
   --soluk: #aaa399;
   --mercan: #e76f8b;
-  --altin: #e0b06c;
+  --altin: #e6c35c;
   --adacayi: #86bfa6;
   --leylak: #a9a7ee;
+  --gok: #7db8e6;
+  --bakir: #e2935f;
   --dal: var(--kemik);
 }
 [data-renk='mercan'] { --dal: var(--mercan); }
 [data-renk='altin'] { --dal: var(--altin); }
 [data-renk='adacayi'] { --dal: var(--adacayi); }
 [data-renk='leylak'] { --dal: var(--leylak); }
+[data-renk='gok'] { --dal: var(--gok); }
+[data-renk='bakir'] { --dal: var(--bakir); }
 [data-renk='kemik'] { --dal: var(--kemik); }

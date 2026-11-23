@@ -3,15 +3,18 @@ import Sayfa from '../duzen/Sayfa.astro';
 import Dal from '../bilesenler/Dal.astro';
 import Ikon from '../bilesenler/Ikon.astro';
 import { acikBolumler, site } from '../site';
+import { gruplanmisDizin } from '../kutuphane/etiket-dizini';
 import { agacKur, yerlestir, type Dugum } from '../kutuphane/agac';
 
 const kok = await agacKur();
 const { yerler, cizgiler } = yerlestir(kok);
 const ebeveyn: Record<string, string> = {};
-const gez = (d: Dugum) => d.cocuklar.forEach((c) => { ebeveyn[c.id] = d.id; gez(c); });
+const etiketleri: Record<string, string[]> = {};
+const gez = (d: Dugum) => d.cocuklar.forEach((c) => { ebeveyn[c.id] = d.id; if (c.kayit) etiketleri[c.id] = c.kayit.etiketler.map((e) => e.id); gez(c); });
 gez(kok);
 const k = yerler.get('kok')!;
 const dallar = kok.cocuklar;
+const gruplar = await gruplanmisDizin();
 ---
 <Sayfa ust={false}>
   <header class="ust-kapsul">
@@ -33,12 +36,24 @@ const dallar = kok.cocuklar;
   <p class="ipucu" aria-hidden="true">Sürükle, tekerlekle yaklaş, bir dala ya da projeye tıkla</p>
   <div class="araclar">
     <div class="kapsul" role="group" aria-label="Görünüm">
+      <button type="button" data-etiket-ac aria-expanded="false" aria-controls="etiket-paneli"><Ikon ad="etiket" /><span>Etiketler</span></button>
       <button type="button" data-yakin="1.35"><Ikon ad="arti" /><span class="gizli">Yaklaş</span></button>
       <button type="button" data-yakin="0.74"><Ikon ad="eksi" /><span class="gizli">Uzaklaş</span></button>
       {acikBolumler.map((b) => <a href={`/${b.id}/`}><Ikon ad="ara" /><span>{acikBolumler.length > 1 ? b.ad : 'Liste'}</span></a>)}
     </div>
   </div>
-  <script type="application/json" id="agac" is:inline set:html={JSON.stringify({ cizgiler, ebeveyn }).replaceAll('<', '\\u003c')} />
+  <div class="suzgec-durumu" data-suzgec-durumu hidden></div>
+  <aside class="etiket-paneli" id="etiket-paneli" aria-label="Etiketle süz" hidden>
+    <header><h2>Etiketler</h2><div><button type="button" data-etiket-temizle hidden>Temizle</button><button type="button" data-etiket-kapat><Ikon ad="kapat" /><span class="gizli">Kapat</span></button></div></header>
+    <p role="status" data-etiket-sonuc>Birkaçını seç, hepsini taşıyan projeler kalsın.</p>
+    {gruplar.map((g) => (
+      <section>
+        <h3>{g.ad}</h3>
+        <ul class="etiketler" role="list">{g.satirlar.map((s) => <li><button type="button" class="etiket" aria-pressed="false" data-etiket-sec={s.etiket.id}>{s.etiket.ad}<span class="adet">{s.kayitlar.length}</span></button></li>)}</ul>
+      </section>
+    ))}
+  </aside>
+  <script type="application/json" id="agac" is:inline set:html={JSON.stringify({ cizgiler, ebeveyn, etiketleri }).replaceAll('<', '\\u003c')} />
   <div class="oda-kabi" hidden slot="son" data-oda-kabi></div>
 </Sayfa>
 <script>

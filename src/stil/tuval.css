@@ -36,15 +36,41 @@ html[data-tuval-acik] .ust-kapsul > * { pointer-events: auto; }
 .tuval[data-acik] .kart:hover { scale: 1.035; z-index: 2; }
 .tuval[data-acik] .kart .ad { padding: 11px 16px 14px; }
 .tuval[data-acik] .kart strong { font-size: calc(19px * var(--iri, 1)); }
-.tuval[data-acik] .kart .alt { font-size: 14px; }
+.tuval[data-acik] .kart .alt { font-size: 15px; }
+.tuval[data-acik] .etiketcik > span { font-size: 13px; }
+.tuval[data-acik] .alt-dal { font-size: calc(21px * min(var(--iri, 1), 1.4)); border-style: dashed; font-weight: 600; }
+.tuval[data-acik] .dugum[data-eslesen] { border-color: var(--dal); box-shadow: 0 0 0 1px var(--dal), 0 18px 60px -18px var(--dal); }
 .tuval[data-acik] .kart[data-genis] strong { font-size: calc(32px * min(var(--iri, 1), 1.2)); }
 .tuval[data-acik] .kart[data-genis] .alt { font-size: 17px; }
-.tuval[data-acik] .dunya[data-uzak] .kart:not([data-genis]) .alt { display: none; }
+.tuval[data-acik] .dunya[data-uzak] .etiketcik { display: none; }
 html[data-tuval-acik] .araclar { position: fixed; right: 1.1rem; bottom: 1.1rem; z-index: 20; display: flex; }
 html[data-tuval-acik] .araclar .kapsul button, html[data-tuval-acik] .araclar .kapsul a { padding: 0 0.85rem; }
 .ipucu { display: none; }
 html[data-tuval-acik] .ipucu { display: block; position: fixed; left: 1.1rem; bottom: 1.1rem; z-index: 15; color: var(--soluk); font-size: 0.95rem; padding: 0.7rem 1.2rem; border-radius: 99px; background: #0b0b0bd9; pointer-events: none; transition: opacity 400ms; }
 html[data-tuval-acik] .ipucu[data-bitti] { opacity: 0; }
+
+/* Etiket paneli */
+.etiket-paneli { position: fixed; z-index: 25; left: 1.1rem; bottom: 1.1rem; width: min(26rem, calc(100vw - 2.2rem)); max-height: min(38rem, calc(100svh - 7.5rem)); overflow-y: auto; padding: 1.1rem 1.2rem 1.3rem; border: 1.5px solid var(--cizgi); border-radius: 20px; background: #131211; scrollbar-width: thin; }
+.etiket-paneli[hidden] { display: none; }
+.etiket-paneli header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; position: sticky; top: -1.1rem; margin: -1.1rem -1.2rem 0; padding: 0.8rem 0.8rem 0.6rem 1.2rem; background: #131211; z-index: 1; }
+.etiket-paneli h2 { font-size: 1.25rem; }
+.etiket-paneli h3 { font-size: 1rem; font-weight: 600; letter-spacing: 0; color: var(--soluk); margin: 1.1rem 0 0.55rem; }
+.etiket-paneli header button { display: inline-flex; align-items: center; justify-content: center; min-width: 2.6rem; min-height: 2.6rem; border: 0; border-radius: 99px; background: none; cursor: pointer; }
+.etiket-paneli header button:hover { background: var(--yuzey-2); }
+.etiket-paneli [data-etiket-sonuc] { color: var(--soluk); }
+.etiket-paneli [data-etiket-temizle] { padding: 0 0.9rem; font-weight: 600; }
+.araclar [aria-expanded='true'] { background: var(--kemik); color: var(--zemin); }
+.araclar [aria-expanded='true'] svg { color: inherit; }
+.etiket-paneli li[hidden], .etiket-paneli section[hidden] { display: none; }
+/* Seçili etiketler: panel kapalıyken de görünür */
+.suzgec-durumu { position: fixed; z-index: 22; left: 50%; translate: -50% 0; bottom: 1.1rem; display: flex; align-items: center; gap: 0.5rem; max-width: calc(100vw - 1.5rem); overflow-x: auto; scrollbar-width: none; padding: 0.45rem 0.6rem 0.45rem 1.1rem; border-radius: 99px; border: 1.5px solid var(--cizgi); background: #131211; white-space: nowrap; }
+.suzgec-durumu[hidden] { display: none; }
+.suzgec-durumu .etiket { flex: none; background: var(--kemik); border-color: var(--kemik); color: var(--zemin); }
+html:not([data-tuval-acik]) .suzgec-durumu { bottom: 4.6rem; }
+@media (max-width: 51.99rem) { .etiket-paneli { left: 0; right: 0; bottom: 0; width: auto; max-height: 62svh; border-radius: 20px 20px 0 0; border-width: 1.5px 0 0; z-index: 30; } }
+html:not([data-tuval-acik]) .araclar { display: flex; position: fixed; right: 0.75rem; bottom: 0.75rem; z-index: 20; }
+html:not([data-tuval-acik]) .araclar [data-yakin] { display: none; }
+.tuval li[hidden] { display: none; }
 
 /* Düğümün içine girme */
 .gecit { position: fixed; z-index: 30; background: #0f0e0e radial-gradient(90% 75% at 62% 30%, color-mix(in srgb, var(--dal) 20%, var(--zemin)), var(--zemin) 75%); overflow: hidden; max-width: none; }

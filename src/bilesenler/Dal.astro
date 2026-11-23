@@ -13,7 +13,7 @@ const sayi = (d: Dugum): number => (d.tur === 'kayit' ? 1 : d.cocuklar.reduce((t
     <Kart kayit={dugum.kayit!} dugum={dugum.id} {...yer ? { yer } : {}} />
   ) : (
     <Fragment>
-      <a href={`#${dugum.id}`} class="dugum dal" data-dal data-dugum={dugum.id} data-renk={dugum.renk} data-yer={yer}><Ikon ad={dugum.ikon} boy={24} /><span>{dugum.ad}</span><span class="sayi">{sayi(dugum)}</span></a>
+      <a href={`#${dugum.id}`} class:list={['dugum', 'dal', dugum.ikon === 'alt' && 'alt-dal']} data-dal data-dugum={dugum.id} data-renk={dugum.renk} data-yer={yer}><Ikon ad={dugum.ikon} boy={24} /><span>{dugum.ad}</span><span class="sayi">{sayi(dugum)}</span></a>
       <ul role="list">{dugum.cocuklar.map((c) => <Astro.self dugum={c} yerler={yerler} />)}</ul>
     </Fragment>
   )}

@@ -3,7 +3,7 @@ import Sayfa from '../duzen/Sayfa.astro';
 import { acikBolumler } from '../site';
 ---
 <Sayfa baslik="Bu dal kurumuş" dizinleme={false}>
-  <div class="sar">
+  <div class="sar sayfa-ic">
     <h1>Bu dal kurumuş</h1>
     <p>Adres yanlış olabilir ya da iş taşınmış olabilir.</p>
     <p><a class="dugme" href="/">Ağaca dön</a></p>
@@ -11,7 +11,6 @@ import { acikBolumler } from '../site';
   </div>
 </Sayfa>
 <style>
-  h1 { font-size: clamp(3rem, 9vw, 6.5rem); letter-spacing: -0.055em; padding-top: 4rem; }
   p { margin-top: 1.25rem; }
   ul { margin-top: 1.5rem; padding-left: 1.2em; }
 </style>

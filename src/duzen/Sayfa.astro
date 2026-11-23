@@ -38,6 +38,7 @@ const yol = Astro.url.pathname;
         <nav class="kapsul" aria-label="Site">
           <a href="/">{site.ad}</a>
           {acikBolumler.map((b) => <a href={`/${b.id}/`} aria-current={yol === `/${b.id}/` ? 'page' : undefined}>{b.ad}</a>)}
+          <a href="/etiket/" aria-current={yol === '/etiket/' ? 'page' : undefined}>Etiketler</a>
         </nav>
       </header>
     )}

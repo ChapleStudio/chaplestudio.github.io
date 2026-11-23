@@ -108,7 +108,7 @@ const gorunen = () => p.$$eval('[data-liste] > li:not([hidden])', (l) => l.lengt
 const hepsi = await gorunen();
 await p.type('input[name=ara]', 'gorsel');
 if (!((await gorunen()) >= 1 && (await gorunen()) < hepsi)) sorun('/isler/', 'arama "gorsel" ile "görsel"i bulmuyor');
-await p.goto(`${taban}/isler/?cesit=oyun`, { waitUntil: 'networkidle0' });
+await p.goto(`${taban}/isler/?kategori=oyun`, { waitUntil: 'networkidle0' });
 const oyun = await gorunen();
 if (!(oyun > 0 && oyun < hepsi)) sorun('/isler/', 'adresten süzme çalışmıyor');
 await p.type('input[name=ara]', 'zzzz');
@@ -148,6 +148,26 @@ for (const [ad, gorunum] of [['masaüstü', { width: 1440, height: 900 }], ['tel
   await t.$eval('[data-oda-kabi] [data-cik]', (a) => a.click());
   await bekleKi('"Ağaca dön" çalışmadı', () => location.pathname === '/' && document.querySelector('[data-oda-kabi]').hidden);
   await bekle(1500);
+  // etiketle süzme
+  await t.$eval('[data-etiket-ac]', (b) => b.click());
+  const [e1, adet] = await t.$eval('.etiket-paneli [data-etiket-sec]', (b) => [b.dataset.etiketSec, Number(b.querySelector('.adet').textContent)]);
+  await t.$eval(`.etiket-paneli [data-etiket-sec="${e1}"]`, (b) => b.click());
+  await bekle(1400);
+  const eslesen = await t.$$eval('[data-eslesen]', (x) => x.length);
+  if (eslesen !== adet) sorun(y, `etiket sayısı tutmuyor: ${e1} ${adet} yerine ${eslesen}`);
+  if (!(await t.evaluate((e) => location.search === `?etiket=${e}`, e1))) sorun(y, 'etiket adrese yazılmadı');
+  if (ad === 'telefon' && (await t.$$eval('.tuval li[data-tur="kayit"]', (l) => l.filter((x) => x.offsetParent).length)) !== adet) sorun(y, 'telefonda eşleşmeyenler gizlenmedi');
+  await t.$eval('[data-etiket-kapat]', (b) => b.click());
+  if (await t.$eval('[data-suzgec-durumu]', (d) => d.hidden)) sorun(y, 'panel kapanınca seçili etiket görünmüyor');
+  const kartYolu = await t.$eval('[data-eslesen]', (a) => { a.click(); return a.pathname; });
+  await bekleKi('süzülmüşken girilmedi', (p) => location.pathname === p && !document.querySelector('[data-oda-kabi]').hidden, kartYolu);
+  await bekle(500);
+  await t.$eval('[data-oda-kabi] [data-etiket]', (a) => a.click());
+  await bekleKi('odadaki etiket ağacı süzmedi', () => location.pathname === '/' && location.search.startsWith('?etiket=') && document.querySelectorAll('[data-eslesen]').length > 0);
+  await bekle(1600);
+  await t.keyboard.press('Escape');
+  await bekle(700);
+  if (await t.$('[data-eslesen]')) sorun(y, 'Esc süzgeci kaldırmadı');
   if (ad === 'masaüstü') {
     const kare = await t.evaluate(() => new Promise((b) => { const s = []; let o = performance.now(); const k = (a) => { s.push(a - o); o = a; s.length < 90 ? requestAnimationFrame(k) : b(s.slice(5).sort((x, z) => x - z)[Math.floor(s.length * 0.9)]); }; requestAnimationFrame(k); }));
     console.log(`Tuval kare süresi (yüzde 90): ${kare.toFixed(1)} ms`);

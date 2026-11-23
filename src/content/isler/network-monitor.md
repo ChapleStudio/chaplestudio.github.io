@@ -1,13 +1,12 @@
 ---
 baslik: Network Monitor
-ozet: Anlık indirme ve yükleme hızını küçük, hep üstte duran bir pencerede gösteren araç.
+ozet: Anlık indirme ve yükleme hızını küçük, hep üstte duran bir pencerede gösteren Windows aracı.
 sahne: ag
-cesit: masaustu
+kategori: sistem
+etiketler: [izleme, ag-hizi, tkinter, python, windows]
 kapsam: 1
 baslangic: 2026-02-05
 guncelleme: 2026-02-05
-teknoloji: [Python]
-platform: [Bilgisayar]
 baglantilar:
   - { tur: kaynak, ad: Kaynak kodu, adres: https://github.com/omerseyfettinozd/Network-Monitor }
 ---

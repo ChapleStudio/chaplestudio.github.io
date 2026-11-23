@@ -1,10 +1,11 @@
 import { getCollection, type CollectionEntry, type CollectionKey } from 'astro:content';
 import { acikBolumler, type Bolum } from '../site';
 import type { IsVerisi, TurKimligi, YaziVerisi } from '../turler/semalar';
-import { cesitler, cesitKimlikleri } from '../turler/is/cesitler';
+import { etiketleriDiz, gruptakiler, type Etiket } from '../etiketler';
+import { altAdi, kategoriler, kategoriKimlikleri } from '../turler/is/kategoriler';
 
 export type Girdi = CollectionEntry<CollectionKey>;
-export type Renk = (typeof cesitler)[keyof typeof cesitler]['renk'] | 'kemik';
+export type Renk = (typeof kategoriler)[keyof typeof kategoriler]['renk'] | 'kemik';
 
 interface VeriTipleri {
   is: IsVerisi;
@@ -22,11 +23,14 @@ export interface Dal {
 
 interface DugumBilgisi {
   dal: Dal;
+  /** Dalın altındaki alt dal, varsa. */
+  altDal: { id: string; ad: string; sira: number } | undefined;
+  etiketler: Etiket[];
   /** Sıralama tarihi: en yeni üstte. */
   tarih: Date;
   turAdi: string;
-  /** Düğümün alt satırı. */
-  kunye: string;
+  /** Düğümde görünen en çok üç etiket. */
+  vitrin: Etiket[];
   genis: boolean;
   suruyor: boolean;
   sahne: string | undefined;
@@ -59,12 +63,14 @@ export const isoGun = (t: Date) => t.toISOString().slice(0, 10);
 /** Her içerik türü kendini ağaca nasıl asacağını burada söyler. */
 const dugumBilgisi: { [T in TurKimligi]: (v: VeriTipleri[T]) => DugumBilgisi } = {
   is: (v) => {
-    const c = cesitler[v.cesit];
+    const c = kategoriler[v.kategori], etiketler = etiketleriDiz(v.etiketler), ad = altAdi(v.kategori, v.alt);
     return {
-      dal: { id: v.cesit, ad: c.ad, renk: c.renk, ikon: c.ikon, sira: cesitKimlikleri.indexOf(v.cesit) },
+      dal: { id: v.kategori, ad: c.ad, renk: c.renk, ikon: c.ikon, sira: kategoriKimlikleri.indexOf(v.kategori) },
+      altDal: v.alt !== undefined && ad !== undefined ? { id: v.alt, ad, sira: Object.keys(c.altlar).indexOf(v.alt) } : undefined,
+      etiketler,
       tarih: v.guncelleme,
       turAdi: c.tekil,
-      kunye: v.teknoloji.join(', '),
+      vitrin: [...gruptakiler(etiketler, 'tur').slice(0, 1), ...gruptakiler(etiketler, 'ozellik').filter((e) => e.id !== '2b').slice(0, 1), ...[...gruptakiler(etiketler, 'arac'), ...gruptakiler(etiketler, 'dil')].slice(0, 1)],
       genis: v.kapsam === 4,
       suruyor: v.suruyor,
       sahne: v.sahne,
@@ -72,7 +78,7 @@ const dugumBilgisi: { [T in TurKimligi]: (v: VeriTipleri[T]) => DugumBilgisi } =
   },
   yazi: (v) => {
     const yil = v.tarih.getUTCFullYear();
-    return { dal: { id: String(yil), ad: String(yil), renk: 'kemik', ikon: 'yazi', sira: -yil }, tarih: v.tarih, turAdi: 'Yazı', kunye: tarihYaz(v.tarih), genis: false, suruyor: false, sahne: v.sahne ?? 'defter' };
+    return { dal: { id: String(yil), ad: String(yil), renk: 'kemik', ikon: 'yazi', sira: -yil }, altDal: undefined, etiketler: etiketleriDiz(v.etiketler), tarih: v.tarih, turAdi: 'Yazı', vitrin: etiketleriDiz(v.etiketler).slice(0, 3), genis: false, suruyor: false, sahne: v.sahne ?? 'defter' };
   },
 };
 

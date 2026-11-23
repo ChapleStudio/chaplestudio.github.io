@@ -1,7 +1,7 @@
 import { acikBolumler, site } from '../site';
 import { bolumKayitlari, type Kayit, type Renk } from './kayit';
 
-/** Ağacın bir düğümü. Kök → (bölüm) → dal → kayıt. Tek bölüm açıkken bölüm katı atlanır. */
+/** Ağacın bir düğümü. Kök → (bölüm) → kategori → (alt dal) → kayıt. Tek bölüm açıkken bölüm katı atlanır. */
 export interface Dugum {
   id: string;
   tur: 'kok' | 'bolum' | 'dal' | 'kayit';
@@ -19,15 +19,17 @@ export interface Yerlesim { yerler: Map<string, Yer>; cizgiler: Cizgi[] }
 
 export const OLCU = {
   kok: { w: 1180, h: 250 },
-  dal: { w: 430, h: 88 },
+  dal: { w: 372, h: 88 },
   kart: { w: 272, h: 250 },
-  genis: { w: 616, h: 400 },
+  genis: { w: 520, h: 350 },
   oluk: 72,
   satir: 44,
   kat: 120,
-  aralik: 110,
+  aralik: 84,
   /** Bir gövdeye en çok bu kadar kayıt asılır; fazlası yan gövdeye geçer. */
   govde: 10,
+  /** Bu kadar kayda kadar tek sütun, fazlası iki sütun. */
+  tekSutun: 3,
 } as const;
 
 export async function agacKur(): Promise<Dugum> {
@@ -38,10 +40,21 @@ export async function agacKur(): Promise<Dugum> {
       const dalId = `${bolum.id}-${k.dal.id}`;
       let dal = dallar.get(dalId);
       if (!dal) dallar.set(dalId, (dal = { id: dalId, tur: 'dal', ad: k.dal.ad, renk: k.dal.renk, ikon: k.dal.ikon, sira: k.dal.sira, cocuklar: [] }));
-      dal.cocuklar.push({ id: `${bolum.id}/${k.id}`, tur: 'kayit', ad: k.baslik, renk: k.dal.renk, ikon: k.dal.ikon, kayit: k, cocuklar: [] });
+      let hedef: Dugum = dal;
+      if (k.altDal) {
+        const altId = `${dalId}-${k.altDal.id}`;
+        let alt = dal.cocuklar.find((c) => c.id === altId) as (Dugum & { sira: number }) | undefined;
+        if (!alt) dal.cocuklar.push((alt = { id: altId, tur: 'dal', ad: k.altDal.ad, renk: k.dal.renk, ikon: 'alt', sira: k.altDal.sira, cocuklar: [] } as Dugum & { sira: number }));
+        hedef = alt;
+      }
+      hedef.cocuklar.push({ id: `${bolum.id}/${k.id}`, tur: 'kayit', ad: k.baslik, renk: k.dal.renk, ikon: k.dal.ikon, kayit: k, cocuklar: [] });
     }
     const cocuklar = [...dallar.values()].sort((a, b) => a.sira - b.sira);
-    for (const d of cocuklar) d.cocuklar.sort((a, b) => Number(b.kayit!.genis) - Number(a.kayit!.genis));
+    const diz = (d: Dugum) => {
+      d.cocuklar.sort((a, b) => (a.kayit && b.kayit ? Number(b.kayit.genis) - Number(a.kayit.genis) : ((a as { sira?: number }).sira ?? 0) - ((b as { sira?: number }).sira ?? 0)));
+      d.cocuklar.forEach(diz);
+    };
+    cocuklar.forEach(diz);
     if (cocuklar.length) bolumler.push({ id: bolum.id, tur: 'bolum', ad: bolum.ad, renk: 'kemik', ikon: 'bolum', cocuklar });
   }
   return { id: 'kok', tur: 'kok', ad: site.ad, renk: 'kemik', ikon: '', cocuklar: bolumler.length === 1 ? bolumler[0]!.cocuklar : bolumler };
@@ -61,20 +74,20 @@ export function yerlestir(kok: Dugum): Yerlesim {
 
   /** Tek gövdeye asılı kayıtlar: gövde ortada iner, kartlar iki yana açılır. */
   const govde = (kayitlar: Dugum[], cikis: () => { x: number; y: number }): Blok => {
-    const ikili = kayitlar.length > 1 || kayitlar.some((k) => k.kayit!.genis);
-    const w = ikili ? OLCU.kart.w * 2 + OLCU.oluk : OLCU.kart.w;
+    const ikili = kayitlar.length > OLCU.tekSutun, genisVar = kayitlar.some((k) => k.kayit!.genis);
+    const w = ikili ? OLCU.kart.w * 2 + OLCU.oluk : genisVar ? OLCU.genis.w : OLCU.kart.w;
     const yerlesik: { d: Dugum; x: number; y: number; w: number; h: number; yan: -1 | 0 | 1 }[] = [];
     let y = 0, sol = true;
     kayitlar.forEach((d, i) => {
       if (d.kayit!.genis) {
-        yerlesik.push({ d, x: 0, y, ...OLCU.genis, w, yan: 0 });
+        yerlesik.push({ d, x: 0, y, w, h: OLCU.genis.h, yan: 0 });
         y += OLCU.genis.h + OLCU.satir;
         sol = true;
         return;
       }
-      const tekSon = sol && (i === kayitlar.length - 1 || kayitlar[i + 1]!.kayit!.genis);
-      const x = !ikili || tekSon ? (w - OLCU.kart.w) / 2 : sol ? 0 : OLCU.kart.w + OLCU.oluk;
-      yerlesik.push({ d, x, y, ...OLCU.kart, yan: !ikili || tekSon ? 0 : sol ? -1 : 1 });
+      const tekSon = !ikili || sol && (i === kayitlar.length - 1 || kayitlar[i + 1]!.kayit!.genis);
+      const x = tekSon ? (w - OLCU.kart.w) / 2 : sol ? 0 : OLCU.kart.w + OLCU.oluk;
+      yerlesik.push({ d, x, y, ...OLCU.kart, yan: tekSon ? 0 : sol ? -1 : 1 });
       if (!sol || tekSon) { y += OLCU.kart.h + OLCU.satir; sol = true; } else sol = false;
     });
     const h = Math.max(...yerlesik.map((k) => k.y + k.h));

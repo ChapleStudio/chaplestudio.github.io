@@ -1,15 +1,16 @@
 ---
 baslik: Yazıyor Bildirimi
-ozet: WhatsApp Web'de biri yazmaya başlayınca masaüstü bildirimi gönderen tarayıcı eklentisi.
+ozet: WhatsApp'ta biri yazmaya başlayınca bildirim gönderen Chrome eklentisi ve Android uygulaması.
 sahne: yaziyor
-cesit: mobil
+kategori: bildirim
+etiketler: [tarayici-eklentisi, mobil-uygulama, whatsapp, erisilebilirlik, javascript, java, chrome, android]
 kapsam: 1
 baslangic: 2026-04-12
 guncelleme: 2026-04-12
-teknoloji: [JavaScript, HTML]
-platform: [Chrome eklentisi]
 baglantilar:
   - { tur: kaynak, ad: Kaynak kodu, adres: https://github.com/omerseyfettinozd/who-writes }
 ---
 
-Yalnız WhatsApp Web sayfasında çalışır. Bildirim ve ayar saklama dışında izin istemez. WhatsApp ile bağlantısı yoktur.
+Tarayıcıda WhatsApp Web sayfasını, telefonda WhatsApp uygulamasını izler; "yazıyor" ifadesini Türkçe dahil birçok dilde tanır. Aynı kişi için üst üste bildirim göndermez.
+
+Chrome eklentisi bildirim ve ayar saklama izniyle çalışır. Android uygulaması ekrandaki yazıyı okumak için erişilebilirlik servisini kullanır ve yalnız WhatsApp'ı dinler. WhatsApp ile bağlantısı yoktur.

@@ -6,7 +6,7 @@ export default defineConfig({
   site: 'https://chaplestudio.github.io',
   trailingSlash: 'always',
   // Yönlendirme sayfaları haritaya girmez: yalnız ana sayfa ve açık bölümler.
-  integrations: [sitemap({ filter: (sayfa) => { const yol = new URL(sayfa).pathname; return yol === '/' || acikBolumler.some((b) => yol.startsWith(`/${b.id}/`)); } })],
+  integrations: [sitemap({ filter: (sayfa) => { const yol = new URL(sayfa).pathname; return yol === '/' || yol.startsWith('/etiket/') || acikBolumler.some((b) => yol.startsWith(`/${b.id}/`)); } })],
   image: { layout: 'constrained' },
   // Shiki satır içi stil yazar, güvenlik ilkesi buna izin vermez.
   markdown: { syntaxHighlight: false },

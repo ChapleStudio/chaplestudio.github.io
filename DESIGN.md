@@ -2,7 +2,7 @@
 
 ## Fikir
 
-Site yukarıdan aşağı dallanan bir **düğüm ağacı**: Chaple Studio → (bölüm) → dal → proje. Rowl Engine'in hikâye tuvalinden gelir. Dala tıklayınca kamera ona uçar, projeye tıklayınca düğüm ekranı kaplar ve içine girilir. İçerik büyüdükçe ağaç büyür; yerleşim `src/kutuphane/agac.ts` içinde hesaplanır, elle konum verilmez.
+Site yukarıdan aşağı dallanan bir **düğüm ağacı**: Chaple Studio → (bölüm) → kategori → (alt dal) → proje. Kategori amaçtır; platform, dil ve araç etikettir. Rowl Engine'in hikâye tuvalinden gelir. Dala tıklayınca kamera ona uçar, projeye tıklayınca düğüm ekranı kaplar ve içine girilir. İçerik büyüdükçe ağaç büyür; yerleşim `src/kutuphane/agac.ts` içinde hesaplanır, elle konum verilmez.
 
 ## Renk
 
@@ -16,9 +16,11 @@ Tek, koyu tema. Renk dalı söyler; listede olmayan renk kullanılmaz.
 | kemik | `#e9e3d8` | Metin, kök, yazılar |
 | soluk | `#aaa399` | İkincil metin |
 | mercan | `#e76f8b` | Oyunlar, fare etkisi |
-| altın | `#e0b06c` | Motorlar |
-| adaçayı | `#86bfa6` | Masaüstü |
-| leylak | `#a9a7ee` | Mobil ve tarayıcı |
+| altın | `#e6c35c` | Oyun geliştirme |
+| leylak | `#a9a7ee` | Yapay zekâ |
+| adaçayı | `#86bfa6` | Sistem ve donanım |
+| gök | `#7db8e6` | Kişiselleştirme |
+| bakır | `#e2935f` | Bildirim araçları |
 
 ## Yazı
 

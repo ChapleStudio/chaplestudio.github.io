@@ -21,14 +21,14 @@ const sablon = {
   is: `---
 baslik: ${tirnak}
 ozet: Ne yaptığını bir cümleyle yaz, en az 20 karakter.
-cesit: oyun # oyun | motor | masaustu | mobil
+kategori: oyun # oyun | oyun-gelistirme | yapay-zeka | sistem | kisisellestirme | bildirim
+alt: arcade # yalnız oyun için: cok-oyunculu | arcade
+etiketler: [sonsuz-kosu, unity, csharp, android] # src/etiketler.ts
 kapsam: 1 # 1 küçük deneme, 4 büyük proje (geniş düğüm)
 baslangic: ${bugun}
 guncelleme: ${bugun}
 suruyor: true
 taslak: true # hazır olunca bu satırı sil
-teknoloji: [Unity]
-platform: [Android]
 baglantilar: []
 ---
 

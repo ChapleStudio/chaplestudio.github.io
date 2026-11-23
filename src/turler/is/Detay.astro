@@ -3,11 +3,14 @@ import { Image } from 'astro:assets';
 import { render } from 'astro:content';
 import Ikon from '../../bilesenler/Ikon.astro';
 import OdaGiris from '../../bilesenler/OdaGiris.astro';
+import Etiketler from '../../bilesenler/Etiketler.astro';
+import { etiketGruplari, gruptakiler, type EtiketGrubu } from '../../etiketler';
 import { ayYilYaz, isoGun, type IsKaydi } from '../../kutuphane/kayit';
 interface Props { kayit: IsKaydi }
 const { kayit } = Astro.props;
 const v = kayit.veri;
 const { Content } = await render(kayit.girdi);
+const grupSirasi = Object.keys(etiketGruplari) as EtiketGrubu[];
 const [kapak, ...digerleri] = v.gorseller;
 ---
 <OdaGiris kayit={kayit}>
@@ -21,9 +24,8 @@ const [kapak, ...digerleri] = v.gorseller;
 </OdaGiris>
 <div class="sar oda-govde" data-renk={kayit.dal.renk}>
   <dl class="kunye">
-    <div><dt>Çeşit</dt><dd>{kayit.turAdi}</dd></div>
-    <div><dt>Platform</dt><dd>{v.platform.join(', ')}</dd></div>
-    <div><dt>Teknoloji</dt><dd>{v.teknoloji.join(', ')}</dd></div>
+    <div><dt>Kategori</dt><dd>{kayit.altDal ? `${kayit.dal.ad}, ${kayit.altDal.ad}` : kayit.dal.ad}</dd></div>
+    {grupSirasi.map((g) => { const e = gruptakiler(kayit.etiketler, g); return e.length > 0 && <div><dt>{etiketGruplari[g].ad}</dt><dd><Etiketler etiketler={e} /></dd></div>; })}
     <div><dt>GitHub'da ilk kayıt</dt><dd><time datetime={isoGun(v.baslangic)}>{ayYilYaz(v.baslangic)}</time></dd></div>
     <div><dt>Son güncelleme</dt><dd><time datetime={isoGun(v.guncelleme)}>{ayYilYaz(v.guncelleme)}</time></dd></div>
     {v.lisans && <div><dt>Lisans</dt><dd>{v.lisans}</dd></div>}

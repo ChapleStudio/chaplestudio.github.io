@@ -2,13 +2,12 @@
 baslik: Rowl Engine
 ozet: Kod bilmeden görsel roman yapmak için oyun motoru ve düğüm tabanlı hikâye editörü.
 sahne: hikaye
-cesit: motor
+kategori: oyun-gelistirme
+etiketler: [oyun-motoru, gorsel-roman, dugum-editoru, kodsuz, sdl3, avalonia, cpp, csharp, lua, linux, windows, android]
 kapsam: 4
 baslangic: 2026-07-29
 guncelleme: 2026-11-11
 suruyor: true
-teknoloji: [C++, C#, SDL3, Avalonia, Lua]
-platform: [Linux, Windows, Android (deneysel)]
 lisans: MIT
 baglantilar:
   - { tur: kaynak, ad: Kaynak kodu, adres: https://github.com/omerseyfettinozd/Rowl-Engine }
@@ -39,6 +38,10 @@ Oyun bitince editör olmadan çalışan bağımsız bir oyun olarak dışa aktar
 - Kaydetme, yükleme ve geri sarma her oyunda hazır
 - Lua betikleri dosya, ağ ve işletim sistemi erişimi olmadan çalışır
 - Türkçe ve İngilizce arayüz
+
+## Nerede çalışıyor
+
+Editör Linux ve Windows'ta. Dışa aktarılan oyun ayrıca Android'de, deneysel olarak.
 
 ## Demo: Kayıp Tablo
 

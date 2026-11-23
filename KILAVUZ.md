@@ -8,6 +8,12 @@ npm run yeni -- isler "Oyunumun Adı"
 
 `src/content/isler/` içinde hazır bir dosya oluşur. Doldur, `taslak: true` satırını sil. Ekran görüntülerini `src/assets/isler/<ad>/` klasörüne koy. Düğümü ağaçta kendiliğinden yerini alır; liste, süzgeç, RSS ve site haritası kendiliğinden güncellenir.
 
+## Kategori ve etiket
+
+- **Kategori işin ne olduğunu söyler** ve ağacın dalıdır: `src/turler/is/kategoriler.ts`. Yeni kategori buraya bir satır; dal, renk ve menü kendiliğinden gelir. `altlar` alt dallardır.
+- **Etiket neyle, nerede, nasıl olduğunu söyler**: `src/etiketler.ts`. Beş grup var: türü, özellikleri, yapıldığı araç, yazılım dili, platform. Her işte en az bir tür, bir dil ve bir platform etiketi zorunlu. Sözlükte olmayan etiket derlemeyi durdurur.
+- Etiket eklenince sayfası (`/etiket/<ad>/`), ağaçtaki süzgeci ve liste süzgeci kendiliğinden oluşur.
+
 ## Düğümün canlı sahnesi
 
 `sahne:` alanına `src/tuval/sahne-kimlikleri.ts` içindeki adlardan birini yaz. Boş bırakırsan ada özgü bir desen çizilir. Yeni sahne için adı oraya, çizimi `src/tuval/sahneler.ts` içine ekle.

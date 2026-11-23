@@ -1,0 +1,22 @@
+---
+import Sayfa from '../../duzen/Sayfa.astro';
+import { gruplanmisDizin } from '../../kutuphane/etiket-dizini';
+const gruplar = await gruplanmisDizin();
+---
+<Sayfa baslik="Etiketler" aciklama="Her şey neyle yapıldı, nerede çalışıyor, ne yapıyor?">
+  <div class="sar sayfa-ic">
+    <h1>Etiketler</h1>
+    {gruplar.map((g) => (
+      <section aria-labelledby={`g-${g.grup}`}>
+        <h2 id={`g-${g.grup}`}>{g.ad}</h2>
+        <p>{g.soru}</p>
+        <ul class="etiketler" role="list">{g.satirlar.map((s) => <li><a class="etiket" href={`/etiket/${s.etiket.id}/`}>{s.etiket.ad}<span class="adet">{s.kayitlar.length}</span></a></li>)}</ul>
+      </section>
+    ))}
+  </div>
+</Sayfa>
+<style>
+  section { margin-top: 3rem; }
+  h2 { font-size: 1.6rem; }
+  section p { color: var(--soluk); margin: 0.3rem 0 1rem; }
+</style>

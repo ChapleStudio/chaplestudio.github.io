@@ -1,0 +1,6 @@
+---
+import type { Etiket } from '../etiketler';
+interface Props { etiketler: Etiket[] }
+const { etiketler } = Astro.props;
+---
+<ul class="etiketler" role="list">{etiketler.map((e) => <li><a class="etiket" href={`/etiket/${e.id}/`} data-etiket={e.id}>{e.ad}</a></li>)}</ul>

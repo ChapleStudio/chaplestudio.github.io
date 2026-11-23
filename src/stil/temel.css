@@ -43,9 +43,10 @@ button, input, select { font: inherit; color: inherit; }
 .dugme.asil { background: var(--dal); border-color: var(--dal); color: var(--zemin); }
 .dugme.asil:hover { background: var(--kemik); border-color: var(--kemik); }
 .oda-govde { display: grid; gap: 3rem; padding-block: 3.5rem 5rem; }
-.kunye { display: grid; grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr)); gap: 1.3rem 1.5rem; align-content: start; }
+.kunye { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(10rem, 100%), 1fr)); gap: 1.5rem; align-content: start; }
 .kunye dt { color: var(--soluk); font-size: 1rem; }
 .kunye dd { margin: 0; font-weight: 600; }
+.kunye .etiketler { margin-top: 0.35rem; }
 .oda figure { margin: 0; }
 figure img { width: 100%; border-radius: 12px; border: 1.5px solid var(--cizgi); }
 figcaption { color: var(--soluk); margin-top: 0.7rem; }
@@ -65,6 +66,19 @@ figure + .yazi { margin-top: 3rem; }
 .komsular ul { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); }
 @media (min-width: 48rem) { .galeri { grid-template-columns: 1fr 1fr; } .galeri figure:last-child:nth-child(odd) { grid-column: 1 / -1; } }
 @media (min-width: 64rem) { .oda-govde { grid-template-columns: 14rem minmax(0, 1fr); gap: 5rem; } .kunye { grid-template-columns: 1fr; position: sticky; top: 2.5rem; align-self: start; } }
+
+/* Etiket */
+.etiketler { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+.etiket { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 2.1rem; padding: 0 0.8rem; border: 1.5px solid #4d4740; border-radius: 99px; text-decoration: none; font-size: 0.95rem; font-weight: 500; line-height: 1.2; background: none; cursor: pointer; transition: border-color 160ms, background-color 160ms, color 160ms; }
+.etiket:hover, .etiket:focus-visible { border-color: var(--dal); }
+.etiket[aria-pressed='true'] { background: var(--kemik); border-color: var(--kemik); color: var(--zemin); }
+.etiket[aria-disabled='true'] { opacity: 0.35; cursor: default; }
+.etiket .adet { color: var(--soluk); font-variant-numeric: tabular-nums; font-size: 0.88rem; }
+.etiket[aria-pressed='true'] .adet { color: inherit; }
+.etiketcik { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.5rem; }
+.etiketcik > span { padding: 0.12rem 0.55rem; border-radius: 99px; background: var(--yuzey-2); color: var(--soluk); font-size: 0.82rem; line-height: 1.4; }
+.sayfa-ic { padding-block: 3rem 6rem; }
+.sayfa-ic > h1 { font-size: clamp(2.6rem, 8vw, 6rem); letter-spacing: -0.055em; overflow-wrap: anywhere; }
 
 /* Kart: ağaçtaki proje düğümü */
 .kart { display: flex; flex-direction: column; border: 1.5px solid #4d4740; border-radius: 16px; background: var(--yuzey); overflow: hidden; text-decoration: none; position: relative; transition: border-color 200ms, box-shadow 200ms; }

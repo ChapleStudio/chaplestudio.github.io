@@ -35,4 +35,7 @@ export const bolumler: readonly Bolum[] = [
   },
 ];
 
+const ayrilmis = ['etiket', '404'];
+for (const b of bolumler) if (ayrilmis.includes(b.id)) throw new Error(`"${b.id}" adı ayrılmış, bölüm adı olamaz`);
+
 export const acikBolumler = bolumler.filter((b) => b.acik);

@@ -2,13 +2,12 @@
 baslik: Snowdesk
 ozet: Windows masaüstüne kar yağdıran, pencerelerin üstünde kar biriktiren küçük bir kış uygulaması.
 sahne: kar
-cesit: masaustu
+kategori: kisisellestirme
+etiketler: [masaustu-susu, ses-tepkili, win32, rust, windows]
 kapsam: 2
 baslangic: 2026-11-22
 guncelleme: 2026-11-22
 suruyor: true
-teknoloji: [Rust]
-platform: [Windows]
 lisans: MIT
 baglantilar:
   - { tur: indir, ad: Windows için indir, adres: "https://github.com/omerseyfettinozd/snowdesk-win/releases/latest", not: Sürüm 0.1.0 }

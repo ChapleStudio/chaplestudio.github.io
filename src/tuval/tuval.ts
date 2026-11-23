@@ -2,13 +2,13 @@ import { ucusYolu, yumusak, type Kamera, type Kutu } from './kamera';
 import { bekletSahneleri, hizliSahne, ODA_DOLULUK, olcekVer, paletAl, sahneCiz, sahneleriEkle } from './sahnelik';
 import { sahneBul } from './sahneler';
 
-interface AgacVerisi { cizgiler: { cocuk: string; yol: string; renk: string }[]; ebeveyn: Record<string, string> }
+interface AgacVerisi { cizgiler: { cocuk: string; yol: string; renk: string }[]; ebeveyn: Record<string, string>; etiketleri: Record<string, string[]> }
 interface Cizgi { kutu: [number, number, number, number]; cocuk: string; nokta: Float32Array; boy: number; renk: string; sonuk: string; gecikme: number }
 
 const $ = <T extends Element>(s: string, k: ParentNode = document) => k.querySelector<T>(s)!;
 const tuval = $<HTMLElement>('[data-tuval]'), zemin = $<HTMLCanvasElement>('.zemin', tuval), dunya = $<HTMLElement>('.dunya', tuval);
 const kap = $<HTMLElement>('[data-oda-kabi]'), ipucu = $<HTMLElement>('.ipucu'), ustKapsul = $<HTMLElement>('.ust-kapsul');
-const { cizgiler: ham, ebeveyn } = JSON.parse($('#agac').textContent!) as AgacVerisi;
+const { cizgiler: ham, ebeveyn, etiketleri } = JSON.parse($('#agac').textContent!) as AgacVerisi;
 const genisEkran = matchMedia('(min-width: 52rem) and (min-height: 30rem)');
 const sakin = matchMedia('(prefers-reduced-motion: reduce)');
 const anaBaslik = document.title;
@@ -32,6 +32,7 @@ const yaprakMi = (id: string) => dugumler.get(id)?.hasAttribute('data-kart') ?? 
 /* ---------- Durum ---------- */
 let acik = false, W = 0, H = 0;
 let kam: Kamera = { x: 0, y: 0, z: 0.5 };
+let secili: Set<string> = new Set(), kalici: Set<string> = new Set();
 let dal = 'kok', vurgulu: Set<string> = new Set(), odada: string | null = null, mesgul = false;
 let buyume = sakin.matches ? 9 : -1, buyumeBasi = 0;
 /** Bir dal seçilince ışık dalgası tepeden uçlara iner. */
@@ -56,7 +57,7 @@ const sigdir = (k: Kutu, enBuyuk = 1.15): Kamera => {
 /** Dal görünümü: sığmayacak kadar uzun dalda okunur bir yakınlıkta tepeden başlar. */
 const dalGorunumu = (id: string): Kamera => {
   const k = kutuHesapla(altlar(id));
-  const g = sigdir(k);
+  const g = sigdir(k, 0.95);
   const okunur = id === 'kok' ? 0.3 : 0.62;
   if (g.z >= okunur) return g;
   const z = Math.min(okunur, (W - 120) / Math.min(k.w, 1900));
@@ -65,6 +66,7 @@ const dalGorunumu = (id: string): Kamera => {
 };
 const enAz = () => Math.min(sigdir(kutuHesapla([...yerler.keys()])).z * 0.7, 0.3);
 
+const ucusuDurdur = () => { ucus?.iptal(); ucus = null; };
 function uc(hedef: Kamera, sure?: number, her?: (p: number) => void): Promise<void> {
   ucus?.iptal();
   hiz = { x: 0, y: 0 };
@@ -88,10 +90,23 @@ function uc(hedef: Kamera, sure?: number, her?: (p: number) => void): Promise<vo
 }
 
 /* ---------- Dal seçme ---------- */
+const eslesenler = () => [...dugumler.keys()].filter((id) => yaprakMi(id) && [...secili].every((e) => etiketleri[id]?.includes(e)));
+/** Dal ya da etiket seçimine göre hangi düğümlerin parlak kalacağını uygular. */
+function karart() {
+  const uyan = secili.size ? eslesenler() : [];
+  const parlak = new Set(secili.size ? uyan.flatMap(soy) : dal === 'kok' ? dugumler.keys() : [...altlar(dal), ...soy(dal)]);
+  parlak.add('kok');
+  kalici = new Set(secili.size ? parlak : []);
+  for (const [n, el] of dugumler) {
+    el.toggleAttribute('data-sonuk', acik && !parlak.has(n));
+    el.toggleAttribute('data-eslesen', secili.size > 0 && yaprakMi(n) && parlak.has(n));
+    const li = el.closest('li');
+    if (li) li.hidden = !acik && secili.size > 0 && !parlak.has(n);
+  }
+}
 function isaretle(id: string) {
   dal = id;
-  const parlak = new Set(id === 'kok' ? dugumler.keys() : [...altlar(id), ...soy(id)]);
-  for (const [n, el] of dugumler) el.toggleAttribute('data-sonuk', acik && !parlak.has(n));
+  karart();
   const zincir = new Set(soy(id));
   for (const a of ustKapsul.querySelectorAll<HTMLElement>('[data-dugum-git]')) {
     const g = a.dataset['dugumGit']!;
@@ -100,13 +115,74 @@ function isaretle(id: string) {
   }
 }
 function dalaGit(id: string, gecmis: boolean) {
-  if (gecmis && (location.hash.slice(1) || 'kok') !== id) history.pushState({ dal: id }, '', id === 'kok' ? '/' : `/#${id}`);
+  etiketSec([], false);
+  if (gecmis && (location.search || (location.hash.slice(1) || 'kok') !== id)) history.pushState({ dal: id }, '', id === 'kok' ? '/' : `/#${id}`);
   isaretle(id);
   ipucu.setAttribute('data-bitti', '');
   dalga = { bas: performance.now(), ids: new Set(altlar(id).slice(1)), kat: derinlik(id) };
   if (acik) void uc(dalGorunumu(id));
   else (id === 'kok' ? document.documentElement : document.getElementById(id))?.scrollIntoView({ behavior: sakin.matches ? 'auto' : 'smooth', block: 'start' });
 }
+
+/* ---------- Etiketle süzme ---------- */
+const panel = $<HTMLElement>('#etiket-paneli'), panelAc = $<HTMLElement>('[data-etiket-ac]'), sonuc = $<HTMLElement>('[data-etiket-sonuc]'), temizle = $<HTMLElement>('[data-etiket-temizle]');
+const ilkSonuc = sonuc.textContent;
+const bilinen = new Set([...panel.querySelectorAll<HTMLElement>('[data-etiket-sec]')].map((b) => b.dataset['etiketSec']!));
+const durum = $<HTMLElement>('[data-suzgec-durumu]');
+/** Panel kapalıyken seçili etiketleri ve sonucu gösterir; etikete basınca kalkar. */
+function durumCiz(sayi: number) {
+  durum.hidden = !secili.size || !panel.hidden;
+  durum.replaceChildren(`${sayi} proje`, ...[...secili].map((id) => {
+    const b = document.createElement('button'), ad = panel.querySelector(`[data-etiket-sec="${id}"]`)!.firstChild!.textContent!;
+    b.type = 'button';
+    b.className = 'etiket';
+    b.dataset['etiketSec'] = id;
+    b.textContent = `${ad} ×`;
+    b.setAttribute('aria-label', `${ad} etiketini kaldır`);
+    return b;
+  }));
+}
+function panelGoster(ac: boolean) {
+  panel.hidden = !ac;
+  durumCiz(eslesenler().length);
+  panelAc.setAttribute('aria-expanded', String(ac));
+  if (ac) ipucu.setAttribute('data-bitti', '');
+}
+/** Seçili etiketlerin hepsini taşıyan projeler kalır; kamera onlara döner. */
+function etiketSec(yeni: Iterable<string>, git = true) {
+  const once = secili.size;
+  secili = new Set([...yeni].filter((e) => bilinen.has(e)));
+  if (!secili.size && !once) return;
+  const uyan = eslesenler();
+  for (const b of panel.querySelectorAll<HTMLElement>('[data-etiket-sec]')) {
+    const id = b.dataset['etiketSec']!, basili = secili.has(id), sayi = uyan.filter((u) => etiketleri[u]?.includes(id)).length;
+    b.setAttribute('aria-pressed', String(basili));
+    b.closest('li')!.hidden = !basili && sayi === 0;
+    b.querySelector('.adet')!.textContent = String(sayi);
+  }
+  for (const g of panel.querySelectorAll<HTMLElement>('section')) g.hidden = !g.querySelector('li:not([hidden])');
+  durumCiz(uyan.length);
+  temizle.hidden = !secili.size;
+  sonuc.textContent = secili.size ? `${uyan.length} proje` : ilkSonuc;
+  if (git) {
+    dal = 'kok';
+    if (secili.size) for (const a of ustKapsul.querySelectorAll('[aria-current]')) a.removeAttribute('aria-current');
+    else isaretle('kok');
+  }
+  karart();
+  if (!git) return;
+  history.replaceState({ etiket: [...secili] }, '', secili.size ? `/?etiket=${[...secili].join(',')}` : '/');
+  if (secili.size) dalga = { bas: performance.now(), ids: kalici, kat: 0 };
+  if (acik) void uc(secili.size && uyan.length ? etiketGorunumu(uyan) : dalGorunumu('kok'));
+}
+/** Eşleşenleri panelin sağında kalan alana sığdırır. */
+function etiketGorunumu(uyan: string[]): Kamera {
+  const k = kutuHesapla([...new Set(uyan.flatMap(soy))].filter((n) => n !== 'kok'));
+  const sol = panel.hidden ? 60 : panel.offsetWidth + 50, en = W - sol - 60;
+  const z = Math.max(0.12, Math.min(en / k.w, (H - 200) / k.h, 0.95));
+  return { x: k.x + k.w / 2 - (sol - 60) / 2 / z, y: k.y + k.h / 2 - 10 / z, z };
+}
+const adrestekiEtiketler = () => (new URLSearchParams(location.search).get('etiket') ?? '').split(',').filter(Boolean);
 
 /* ---------- Düğümün içine girme ---------- */
 const onbellek = new Map<string, Promise<Document>>();
@@ -156,7 +232,7 @@ function odayiDoldur(sayfa: Document) {
   kap.hidden = false;
   document.title = sayfa.title;
   document.documentElement.setAttribute('data-oda', '');
-  tuval.inert = ustKapsul.inert = true;
+  tuval.inert = ustKapsul.inert = panel.inert = durum.inert = true;
   sahneleriEkle(kap);
   const b = kap.querySelector<HTMLElement>('h1');
   if (b) { b.tabIndex = -1; b.focus({ preventScroll: true }); }
@@ -192,7 +268,7 @@ async function gir(yol: string, gecmis: boolean) {
   finally { mesgul = false; bekletSahneleri(false); }
 }
 
-async function cik(hedefDal: string) {
+async function cik(hedefDal: string, etiketler: string[] = []) {
   const yol = odada;
   if (!yol || mesgul) return;
   mesgul = true;
@@ -204,7 +280,7 @@ async function cik(hedefDal: string) {
     kap.replaceChildren();
     kap.removeAttribute('data-cikiyor');
     document.documentElement.removeAttribute('data-oda');
-    tuval.inert = ustKapsul.inert = false;
+    tuval.inert = ustKapsul.inert = panel.inert = durum.inert = false;
   };
   if (!kart || sakin.matches) { kapat(); if (acik) kam = dalGorunumu(hedefDal); uygula(); dunya.style.opacity = ''; }
   else {
@@ -228,6 +304,7 @@ async function cik(hedefDal: string) {
   isaretle(hedefDal);
   vurgula(null);
   mesgul = false;
+  if (etiketler.length) { panelGoster(false); etiketSec(etiketler); }
   kart?.focus({ preventScroll: acik });
 }
 const sure = (ms: number, her: (p: number) => void) => new Promise<void>((bitti) => {
@@ -317,8 +394,8 @@ function isikCiz(t: number) {
   isiklar.forEach((i, n) => {
     const x = X(i.x), y = Y(i.y), r = i.r * kam.z * (1 + 0.05 * Math.sin(t * 0.5 + n * 1.7));
     if (x + r < 0 || x - r > W || y + r < 0 || y - r > H) return;
-    const secili = dal === 'kok' || soy(dal).includes(i.id) || soy(i.id).includes(dal);
-    c2d.globalAlpha = Math.min(1, Math.max(0, buyume * 0.6)) * (secili ? 1 : 0.2);
+    const parlak = kalici.size ? kalici.has(i.id) : dal === 'kok' || soy(dal).includes(i.id) || soy(i.id).includes(dal);
+    c2d.globalAlpha = Math.min(1, Math.max(0, buyume * 0.6)) * (parlak ? 1 : 0.2);
     c2d.drawImage(i.leke, x - r, y - r, r * 2, r * 2);
   });
   c2d.globalAlpha = 1;
@@ -351,7 +428,7 @@ function zeminCiz(an: number) {
   noktaCiz(74, 0.55, 0.07);
   noktaCiz(56, 1, 0.2);
   tozCiz(t0);
-  const dalSoyu = dal === 'kok' ? null : new Set([...altlar(dal), ...soy(dal)]);
+  const dalSoyu = kalici.size ? kalici : dal === 'kok' ? null : new Set([...altlar(dal), ...soy(dal)]);
   c2d.lineCap = c2d.lineJoin = 'round';
   const t = sakin.matches ? 0 : an / 1000;
   const gorunur = cizgiler.filter(({ kutu: [a, b, c, e] }) => X(c) > -30 && X(a) < W + 30 && Y(e) > -30 && Y(b) < H + 30);
@@ -366,7 +443,7 @@ function zeminCiz(an: number) {
     if (p < 1) { c2d.fillStyle = c.renk; c2d.beginPath(); c2d.arc(x, y, 4, 0, 7); c2d.fill(); }
   }
   for (const c of gorunur) {
-    const parlak = vurgulu.has(c.cocuk);
+    const parlak = vurgulu.has(c.cocuk) || kalici.has(c.cocuk);
     if (ilerleme(c) < 1 || (dalSoyu && !dalSoyu.has(c.cocuk) && !parlak)) continue;
     c2d.strokeStyle = c.renk;
     if (parlak) {
@@ -430,7 +507,7 @@ const parmaklar = new Map<number, { x: number; y: number }>();
 let kistirma = 0;
 tuval.addEventListener('pointerdown', (e) => {
   if (!acik || e.button !== 0) return;
-  ucus?.iptal(); ucus = null;
+  ucusuDurdur();
   parmaklar.set(e.pointerId, { x: e.clientX, y: e.clientY });
   tutulan = { x: e.clientX, y: e.clientY, kx: kam.x, ky: kam.y, yol: 0, son: performance.now() };
   surukledi = false;
@@ -465,7 +542,7 @@ tuval.addEventListener('dragstart', (e) => e.preventDefault());
 tuval.addEventListener('wheel', (e) => {
   if (!acik) return;
   e.preventDefault();
-  ucus?.iptal(); ucus = null;
+  ucusuDurdur();
   ipucu.setAttribute('data-bitti', '');
   yakinlas(Math.exp(-Math.max(-240, Math.min(240, e.deltaY * (e.deltaMode ? 20 : 1))) * 0.0016), e.clientX, e.clientY);
 }, { passive: false });
@@ -492,17 +569,35 @@ document.addEventListener('click', (e) => {
   if (!(e.target instanceof Element)) return;
   const yakin = e.target.closest<HTMLElement>('[data-yakin]');
   if (yakin) { void uc({ ...kam, z: Math.min(2.4, Math.max(enAz(), kam.z * Number(yakin.dataset['yakin']))) }, 320); return; }
+  if (e.target.closest('[data-etiket-ac]')) { panelGoster(Boolean(panel.hidden)); if (!panel.hidden) panel.querySelector<HTMLElement>('[data-etiket-sec]')?.focus(); return; }
+  if (e.target.closest('[data-etiket-kapat]')) { panelGoster(false); panelAc.focus(); return; }
+  if (e.target.closest('[data-etiket-temizle]')) { etiketSec([]); panel.querySelector<HTMLElement>('[data-etiket-sec]')?.focus(); return; }
+  const sec = e.target.closest<HTMLElement>('[data-etiket-sec]');
+  if (sec) {
+    const id = sec.dataset['etiketSec']!;
+    etiketSec(secili.has(id) ? [...secili].filter((x) => x !== id) : [...secili, id]);
+    return;
+  }
   const a = e.target.closest<HTMLAnchorElement>('a[href]');
   if (surukledi && tuval.contains(e.target)) { e.preventDefault(); surukledi = false; return; }
   if (!a || !sadeTik(e) || a.origin !== location.origin) return;
   if (a.hasAttribute('data-dal')) { e.preventDefault(); if (!mesgul) dalaGit(a.hash.slice(1), true); return; }
   if (a.hasAttribute('data-cik') && odada) { e.preventDefault(); const d = dalAdi(odada); history.pushState({ dal: d }, '', d === 'kok' ? '/' : `/#${d}`); void cik(d); return; }
+  if (odada && a.dataset['etiket']) {
+    e.preventDefault();
+    const id = a.dataset['etiket'];
+    history.pushState({ etiket: [id] }, '', `/?etiket=${id}`);
+    void cik('kok', [id]);
+    return;
+  }
   if (a.hasAttribute('data-kart') || (kap.contains(a) && kartBul(a.pathname))) { e.preventDefault(); void gir(a.pathname, true); }
 });
 addEventListener('keydown', (e) => {
   if (e.ctrlKey || e.metaKey || e.altKey || (e.target instanceof Element && e.target.closest('input, select, textarea'))) return;
   if (e.key === 'Escape') {
     if (odada) { const d = dalAdi(odada); history.pushState({ dal: d }, '', d === 'kok' ? '/' : `/#${d}`); void cik(d); }
+    else if (secili.size) etiketSec([]);
+    else if (!panel.hidden) { panelGoster(false); panelAc.focus(); }
     else if (dal !== 'kok') dalaGit(ust(dal) ?? 'kok', true);
     return;
   }
@@ -525,7 +620,10 @@ addEventListener('popstate', () => {
   if (location.pathname === '/') {
     const id = decodeURIComponent(location.hash.slice(1)) || 'kok';
     const hedef = dugumler.has(id) ? (yaprakMi(id) ? (ust(id) ?? 'kok') : id) : 'kok';
-    if (odada) void cik(hedef); else dalaGit(hedef, false);
+    const etiketler = adrestekiEtiketler();
+    if (odada) void cik(hedef, etiketler);
+    else if (etiketler.length) etiketSec(etiketler);
+    else dalaGit(hedef, false);
   } else if (kartBul(location.pathname)) void gir(location.pathname, false);
   else location.reload();
 });
@@ -541,7 +639,7 @@ function kur() {
     const k = yerler.get(id)!;
     Object.assign(el.style, acik ? { left: `${k.x}px`, top: `${k.y}px`, width: `${k.w}px`, height: `${k.h}px` } : { left: '', top: '', width: '', height: '' });
   }
-  if (!acik) { dunya.style.transform = ''; dunya.style.opacity = ''; olcekVer(1); for (const el of dugumler.values()) { el.removeAttribute('data-kapali'); el.removeAttribute('data-sonuk'); } return; }
+  if (!acik) { dunya.style.transform = ''; dunya.style.opacity = ''; olcekVer(1); for (const el of dugumler.values()) { el.removeAttribute('data-kapali'); } karart(); return; }
   if (!odada && !ucus) { kam = dalGorunumu(dal); uygula(); olcekVer(kam.z); }
   if (!once) isaretle(dal);
 }
@@ -563,6 +661,15 @@ if (dugumler.has(ilkKimlik) && ilkKimlik !== 'kok') {
   kam = { ...kam, z: kam.z * 1.5, y: yerler.get('kok')!.y + 260 };
   uygula();
   void uc(son, 2400);
+}
+const ilkEtiketler = adrestekiEtiketler();
+if (ilkEtiketler.length) {
+  buyume = 9;
+  for (const el of dugumler.values()) el.removeAttribute('data-kapali');
+  ucusuDurdur();
+  if (acik) kam = dalGorunumu('kok');
+  panelGoster(false);
+  etiketSec(ilkEtiketler);
 }
 addEventListener('resize', kur);
 genisEkran.addEventListener('change', kur);

@@ -1,6 +1,7 @@
 import { z } from 'astro/zod';
 import type { SchemaContext } from 'astro:content';
-import { cesitKimlikleri } from './is/cesitler';
+import { etiketBul, etiketKimlikleri } from '../etiketler';
+import { kategoriKimlikleri, kategoriler, altAdi } from './is/kategoriler';
 import { sahneKimlikleri } from '../tuval/sahne-kimlikleri';
 
 const httpsAdres = z.url({ protocol: /^https$/ });
@@ -22,14 +23,16 @@ export const semalar = {
     z
       .object({
         ...ortak,
-        cesit: z.enum(cesitKimlikleri),
+        /** İş ne? src/turler/is/kategoriler.ts */
+        kategori: z.enum(kategoriKimlikleri),
+        alt: z.string().optional(),
+        /** Neyle, nerede, nasıl? src/etiketler.ts */
+        etiketler: z.array(z.enum(etiketKimlikleri)).min(3),
         /** 1 küçük deneme, 4 büyük proje. 4 olanın düğümü geniştir. */
         kapsam: z.int().min(1).max(4),
         baslangic: z.coerce.date(),
         guncelleme: z.coerce.date(),
         suruyor: z.boolean().default(false),
-        teknoloji: z.array(z.string().min(1)).min(1),
-        platform: z.array(z.string().min(1)).min(1),
         lisans: z.string().optional(),
         baglantilar: z
           .array(
@@ -46,10 +49,18 @@ export const semalar = {
           .default([]),
       })
       .strict()
-      .refine((d) => d.guncelleme >= d.baslangic, { error: 'guncelleme, baslangic tarihinden önce olamaz' }),
+      .refine((d) => d.guncelleme >= d.baslangic, { error: 'guncelleme, baslangic tarihinden önce olamaz' })
+      .superRefine((d, c) => {
+        const altlar = Object.keys(kategoriler[d.kategori].altlar);
+        if (altlar.length ? altAdi(d.kategori, d.alt) === undefined : d.alt !== undefined)
+          c.addIssue({ code: 'custom', path: ['alt'], message: altlar.length ? `bu kategoride alt dal gerekli: ${altlar.join(', ')}` : 'bu kategorinin alt dalı yok' });
+        for (const grup of ['tur', 'dil', 'platform'] as const)
+          if (!d.etiketler.some((e) => etiketBul(e).grup === grup)) c.addIssue({ code: 'custom', path: ['etiketler'], message: `en az bir "${grup}" etiketi gerekli` });
+        if (new Set(d.etiketler).size !== d.etiketler.length) c.addIssue({ code: 'custom', path: ['etiketler'], message: 'aynı etiket iki kez yazılmış' });
+      }),
   yazi: (_: SchemaContext) =>
     z
-      .object({ ...ortak, tarih: z.coerce.date(), guncelleme: z.coerce.date().optional(), etiketler: z.array(z.string()).default([]) })
+      .object({ ...ortak, tarih: z.coerce.date(), guncelleme: z.coerce.date().optional(), etiketler: z.array(z.enum(etiketKimlikleri)).default([]) })
       .strict(),
 } as const;
 
