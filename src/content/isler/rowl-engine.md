@@ -2,6 +2,8 @@
 baslik: Rowl Engine
 ozet: Kod bilmeden görsel roman yapmak için oyun motoru ve düğüm tabanlı hikâye editörü.
 sahne: hikaye
+tema: rowl
+arka: ../../assets/isler/rowl-engine/scene-earthquake.jpg
 kategori: oyun-gelistirme
 etiketler: [oyun-motoru, gorsel-roman, dugum-editoru, kodsuz, sdl3, avalonia, cpp, csharp, lua, linux, windows, android]
 kapsam: 4

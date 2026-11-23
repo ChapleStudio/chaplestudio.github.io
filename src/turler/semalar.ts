@@ -2,6 +2,7 @@ import { z } from 'astro/zod';
 import type { SchemaContext } from 'astro:content';
 import { etiketBul, etiketKimlikleri } from '../etiketler';
 import { kategoriKimlikleri, kategoriler, altAdi } from './is/kategoriler';
+import { temaKimlikleri } from '../temalar/tema';
 import { sahneKimlikleri } from '../tuval/sahne-kimlikleri';
 
 const httpsAdres = z.url({ protocol: /^https$/ });
@@ -15,6 +16,10 @@ const ortak = {
   sahne: z.enum(sahneKimlikleri).optional(),
   /** Adres değişirse eskisi buraya yazılır, ziyaretçi yeni adrese yönlenir. */
   eskiAdresler: z.array(adresParcasi).default([]),
+  /** Projenin kendi görünüşü: src/temalar/tema.ts */
+  tema: z.enum(temaKimlikleri).default('studyo'),
+  /** Kendi sitesi varsa adresi (public/<yol>/). Düğümün içine girilince o açılır, sayfa üretilmez. */
+  kendiSitesi: z.string().regex(/^\/[a-z0-9-]+\/$/).optional(),
   taslak: z.boolean().default(false),
 };
 
@@ -44,6 +49,8 @@ export const semalar = {
             }),
           )
           .default([]),
+        /** Temanın giriş sahnesinde arka plan olarak kullanabileceği gerçek görsel. */
+        arka: image().optional(),
         gorseller: z
           .array(z.object({ dosya: image(), alt: z.string().min(10), altyazi: z.string().optional() }))
           .default([]),

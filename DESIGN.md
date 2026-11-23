@@ -2,38 +2,37 @@
 
 ## Fikir
 
-Site yukarıdan aşağı dallanan bir **düğüm ağacı**: Chaple Studio → (bölüm) → kategori → (alt dal) → proje. Kategori amaçtır; platform, dil ve araç etikettir. Rowl Engine'in hikâye tuvalinden gelir. Elle yakınlaştırma ve sürükleme yoktur; tekerlek sayfayı dikey kaydırır. Dala tıklayınca kamera ona uçar, projeye tıklayınca düğüm ekranı kaplar ve içine girilir. İçerik büyüdükçe ağaç büyür; yerleşim `src/kutuphane/agac.ts` içinde hesaplanır, elle konum verilmez.
+Site toprağın altına inen **kökler**: Chaple Studio yüzeyde, kategoriler kalın kökler, projeler köklerin ucundaki dünyalar. Her dal yukarıdan aşağı iner; içerik büyüdükçe kökler uzar. Yerleşim `src/kutuphane/agac.ts` içinde hesaplanır. Elle yakınlaştırma yoktur; tekerlek dikey kaydırır, dala tıklayınca kamera ona uçar, projenin içine girilir.
 
-## Renk
+**Stüdyo tek kalıp dayatmaz.** Her proje kendi temasını taşıyabilir: düğümü ağaçta o temayla görünür, içine girince bütün sayfa onun dünyasıdır.
 
-Tek, koyu tema. Renk dalı söyler; listede olmayan renk kullanılmaz.
+## Stüdyonun rengi
 
-| Ad | Değer | Görev |
-|---|---|---|
-| zemin | `#0b0b0b` | Tuval |
-| yüzey | `#151413`, `#1f1d1b` | Düğüm, kapsül |
-| çizgi | `#3a3631`, `#4d4740` | Kenar |
-| kemik | `#e9e3d8` | Metin, kök, yazılar |
-| soluk | `#aaa399` | İkincil metin |
-| mercan | `#e76f8b` | Oyunlar, fare etkisi |
-| altın | `#e6c35c` | Oyun geliştirme |
-| leylak | `#a9a7ee` | Yapay zekâ |
-| adaçayı | `#86bfa6` | Sistem ve donanım |
-| gök | `#7db8e6` | Kişiselleştirme |
-| bakır | `#e2935f` | Bildirim araçları |
+Gece toprağı: mürdüm zemin `#1d1218`, toprak `#24161c`, kemik yazı `#f2e6da`. Kök boyaları: mercan (Oyunlar), altın (Oyun geliştirme), leylak (Yapay zekâ), adaçayı (Sistem ve donanım), gök (Kişiselleştirme), bakır (Bildirim araçları). Listede olmayan renk yalnız bir temanın içinde kullanılır.
 
 ## Yazı
 
-Schibsted Grotesk, tek aile, siteden sunulur. Başlık 750 ve sıkı, metin 400, en çok 66 karakter. Tamamı büyük harf etiket ve başlık üstü küçük etiket yok.
+Başlık Grenze 600-700 (el kesimi, oyun kutusu havası), metin Alegreya Sans 400/500/700. Temalar kendi yazısını getirir: Rowl'da Piazzolla, Fairy of Light'ta Grandstander.
 
-## Düğüm
+## Biçim
 
-Proje düğümünde ekran görüntüsü yerine ne yaptığını anlatan küçük bir canlı sahne oynar. Sahneler 200 birim yüksekliğinde çizilir, yakınlaşınca gerçekten büyür. Gerçek ekran görüntüleri proje sayfasındadır. Üzerinde çalışılan projenin köşesinde nokta durur.
+- Köşeler eşit değil, elle kesilmiş gibi (`--kose`). Hap biçimi, cam, parlama, renk lekesi, süzülen toz, noktalı ızgara yok.
+- Kökler kalınlığı azalan, kıvrımlı şekillerdir; çizgi değildir.
+- Etiketler sol ucu kesik bez etiket biçimindedir.
+- Düğümlerde ne yaptığını anlatan küçük canlı sahne oynar; gerçek ekran görüntüleri proje sayfasındadır.
+
+## Temalar
+
+| Tema | Proje | Dünya |
+|---|---|---|
+| studyo | varsayılan | Gece toprağı |
+| rowl | Rowl Engine | Mor perde, sahne ve görsel roman konuşma kutusu |
+| peri | Fairy of Light | Alacakaranlık ormanı, ışık yalnız periden gelir |
 
 ## Hareket
 
-- Açılışta dallar kökten büyür, bir kez.
-- Dallarda ışık akar; seçilen dala ışık dalgası iner, ötekiler kararır.
+- Açılışta kökler aşağı doğru büyür, bir kez.
+- Köklerin içinde özsu ağır ağır iner; seçilen dal kendi rengine boyanır, ötekiler kararır.
 - Kamera yolu yakınlaşmayı ve kaydırmayı birlikte yapar (van Wijk).
 - Girişte düğümün sahnesi ekranı kaplar, çıkışta aynı yoldan geri döner.
 - `prefers-reduced-motion` hepsini kapatır.

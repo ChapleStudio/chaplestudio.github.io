@@ -2,9 +2,9 @@ import { canliTut, dongu } from './tempo';
 import { ucusYolu, yumusak, type Kamera, type Kutu } from './kamera';
 import { bekletSahneleri, hizliSahne, ODA_DOLULUK, olcekVer, paletAl, sahneCiz, sahneleriEkle } from './sahnelik';
 import { sahneBul } from './sahneler';
+import { zeminKur, type Dalga, type HamCizgi } from './zemin';
 
-interface AgacVerisi { cizgiler: { cocuk: string; yol: string; renk: string }[]; ebeveyn: Record<string, string>; etiketleri: Record<string, string[]> }
-interface Cizgi { kutu: [number, number, number, number]; cocuk: string; nokta: Float32Array; boy: number; renk: string; sonuk: string; gecikme: number }
+interface AgacVerisi { cizgiler: HamCizgi[]; ebeveyn: Record<string, string>; etiketleri: Record<string, string[]> }
 
 const $ = <T extends Element>(s: string, k: ParentNode = document) => k.querySelector<T>(s)!;
 const tuval = $<HTMLElement>('[data-tuval]'), zemin = $<HTMLCanvasElement>('.zemin', tuval), dunya = $<HTMLElement>('.dunya', tuval);
@@ -38,10 +38,10 @@ let secili: Set<string> = new Set(), kalici: Set<string> = new Set();
 let dal = 'kok', vurgulu: Set<string> = new Set(), odada: string | null = null, mesgul = false;
 let buyume = sakin.matches ? 9 : -1, buyumeBasi = 0;
 /** Bir dal seçilince ışık dalgası tepeden uçlara iner. */
-let dalga: { bas: number; ids: Set<string>; kat: number } | null = null;
+let dalga: Dalga | null = null;
 /** Geçerli görünümde dikey kaymanın sınırları ve yumuşak kaymanın hedefi. */
 let kayma = { en: 0, son: 0 }, hedefY: number | null = null;
-let fare = { x: -999, y: -999 }, ucus: { iptal: () => void } | null = null;
+let ucus: { iptal: () => void } | null = null;
 
 const uygula = () => {
   dunya.style.transform = `translate3d(${W / 2 - kam.x * kam.z}px, ${H / 2 - kam.y * kam.z}px, 0) scale(${kam.z})`;
@@ -237,12 +237,25 @@ function gecitKur(kart: HTMLElement) {
   };
 }
 
+/** Odanın tema stilini yükler; bitmeden içerik gösterilmez. */
+async function temaYukle(sayfa: Document) {
+  await Promise.all([...sayfa.querySelectorAll<HTMLLinkElement>('link[data-tema-stili]')].map((l) => {
+    const adres = new URL(l.getAttribute('href')!, location.origin).href;
+    if ([...document.querySelectorAll<HTMLLinkElement>('link[data-tema-stili]')].some((x) => x.href === adres)) return undefined;
+    const yeni = document.createElement('link');
+    yeni.rel = 'stylesheet';
+    yeni.href = adres;
+    yeni.setAttribute('data-tema-stili', '');
+    return new Promise<void>((b) => { yeni.onload = yeni.onerror = () => b(); document.head.append(yeni); });
+  }));
+  return sayfa;
+}
 function odayiDoldur(sayfa: Document) {
   const ic = sayfa.querySelector('#icerik');
   if (!ic) throw new Error('içerik yok');
   kap.replaceChildren(...[...ic.children].map((c) => document.importNode(c, true)));
-  kap.scrollTop = 0;
   kap.hidden = false;
+  kap.scrollTop = 0;
   document.title = sayfa.title;
   document.documentElement.setAttribute('data-oda', '');
   tuval.inert = ustKapsul.inert = panel.inert = durum.inert = true;
@@ -256,11 +269,13 @@ async function gir(yol: string, gecmis: boolean) {
   if (mesgul) return;
   if (!kart) { location.assign(yol); return; }
   mesgul = true;
-  const bekleyen = getir(yol);
-  if (gecmis) history.pushState({ oda: yol }, '', yol);
+  const kendi = kart.hasAttribute('data-kendi');
+  const bekleyen = kendi ? null : getir(yol).then(temaYukle);
+  if (gecmis && bekleyen) history.pushState({ oda: yol }, '', yol);
   try {
-    if (odada) { odayiDoldur(await bekleyen); odada = yol; return; }
-    if (sakin.matches) { odayiDoldur(await bekleyen); odada = yol; return; }
+    if (!bekleyen && sakin.matches) { location.assign(yol); return; }
+    if (odada) { odayiDoldur(await bekleyen!); odada = yol; return; }
+    if (sakin.matches) { odayiDoldur(await bekleyen!); odada = yol; return; }
     buyume = 9;
     for (const el of dugumler.values()) el.removeAttribute('data-kapali');
     bekletSahneleri(true);
@@ -273,6 +288,8 @@ async function gir(yol: string, gecmis: boolean) {
       });
     } else await sure(620, (p) => gecit.koy(yumusak(p)));
     gecit.koy(1);
+    // Kendi sitesi olan proje: geçit ekranı kaplayınca o site açılır.
+    if (!bekleyen) { history.replaceState(null, '', `/#${kart.dataset['dugum']}`); location.assign(yol); return; }
     odayiDoldur(await bekleyen);
     odada = yol;
     await ikiKare();
@@ -328,166 +345,24 @@ const sure = (ms: number, her: (p: number) => void) => canliTut(new Promise<void
 const ikiKare = () => new Promise<void>((b) => requestAnimationFrame(() => requestAnimationFrame(() => b())));
 const dalAdi = (yol: string) => { const k = kartBul(yol); return k ? (ust(k.dataset['dugum']!) ?? 'kok') : 'kok'; };
 
-/* ---------- Zemin: noktalar, dallar, ışık ---------- */
+/* ---------- Zemin: toprak ve kökler ---------- */
 const renkCoz = (ad: string) => getComputedStyle(document.documentElement).getPropertyValue(`--${ad}`).trim();
-const soldur = (r: string, o: number) => { const n = parseInt(r.slice(1), 16); return `rgb(${[n >> 16, (n >> 8) & 255, n & 255].map((v) => Math.round(v * o + 11 * (1 - o))).join(',')})`; };
-const cizgiler: Cizgi[] = ham.map((c) => {
-  const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-  p.setAttribute('d', c.yol);
-  const boy = p.getTotalLength(), n = Math.max(16, Math.min(420, Math.round(boy / 5))), nokta = new Float32Array((n + 1) * 2);
-  for (let i = 0; i <= n; i++) { const q = p.getPointAtLength((boy * i) / n); nokta[i * 2] = q.x; nokta[i * 2 + 1] = q.y; }
-  let kx0 = Infinity, ky0 = Infinity, kx1 = -Infinity, ky1 = -Infinity;
-  for (let i = 0; i <= n; i++) { const x = nokta[i * 2]!, y = nokta[i * 2 + 1]!; kx0 = Math.min(kx0, x); kx1 = Math.max(kx1, x); ky0 = Math.min(ky0, y); ky1 = Math.max(ky1, y); }
-  const renk = renkCoz(c.renk);
-  return { kutu: [kx0, ky0, kx1, ky1], cocuk: c.cocuk, nokta, boy, renk, sonuk: soldur(renk, 0.42), gecikme: yaprakMi(c.cocuk) ? 0.55 : 0 };
-});
-for (const c of cizgiler) c.gecikme = Math.max(0, derinlik(c.cocuk) - 1) * 0.6 + (yaprakMi(c.cocuk) ? Math.min(0.5, ((yerler.get(c.cocuk)!.y) / 2600) * 0.5) : 0);
-
+const toprakAlti = zeminKur(zemin, ham, renkCoz, derinlik, yaprakMi, yerler);
 function vurgula(id: string | null) { vurgulu = new Set(id ? soy(id) : []); }
-const c2d = zemin.getContext('2d')!;
-const X = (x: number) => (x - kam.x) * kam.z + W / 2, Y = (y: number) => (y - kam.y) * kam.z + H / 2;
-
-const mercan = renkCoz('mercan');
-const karo = document.createElement('canvas');
-karo.width = karo.height = 64;
-{ const k = karo.getContext('2d')!; k.fillStyle = '#e9e3d8'; k.fillRect(31, 31, 2, 2); }
-const desen = c2d.createPattern(karo, 'repeat')!;
-/** Sabit noktalar tek desenle boyanır; yalnız farenin çevresindekiler tek tek çizilir. */
-function noktaCiz(aralik: number, derin: number, parlaklik: number) {
-  let adim = aralik * kam.z * derin;
-  while (adim < 24) adim *= 2;
-  while (adim > 66) adim /= 2;
-  const ox = (((W / 2 - kam.x * kam.z * derin) % adim) + adim) % adim, oy = (((H / 2 - kam.y * kam.z * derin) % adim) + adim) % adim;
-  const o = adim / 64;
-  desen.setTransform(new DOMMatrix([o, 0, 0, o, ox - 32 * o, oy - 32 * o]));
-  c2d.globalAlpha = parlaklik;
-  c2d.fillStyle = desen;
-  c2d.fillRect(0, 0, W, H);
-  if (derin === 1) {
-    c2d.fillStyle = mercan;
-    const R = 180, bx = Math.ceil((fare.x - R - ox) / adim) * adim + ox, by = Math.ceil((fare.y - R - oy) / adim) * adim + oy;
-    for (let x = bx; x < fare.x + R; x += adim) for (let y = by; y < fare.y + R; y += adim) {
-      const dx = x - fare.x, dy = y - fare.y, u = Math.hypot(dx, dy);
-      if (u > R) continue;
-      const g = 1 - u / R, it = g * g * 9, r = 1 + g * 1.9;
-      c2d.globalAlpha = g * 0.85;
-      c2d.fillRect(x + (dx / (u || 1)) * it - r / 2, y + (dy / (u || 1)) * it - r / 2, r, r);
-    }
-  }
-  c2d.globalAlpha = 1;
-}
-function izCiz(n: Float32Array, bas: number, son: number) {
-  // Uzaktan bakınca her noktaya gerek yok.
-  const m = n.length / 2 - 1, a = bas * m, b = son * m, atla = Math.max(1, Math.floor(1.6 / kam.z));
-  const ara = (t: number): [number, number] => { const i = Math.min(m - 1, Math.floor(t)), k = t - i; return [n[i * 2]! * (1 - k) + n[i * 2 + 2]! * k, n[i * 2 + 1]! * (1 - k) + n[i * 2 + 3]! * k]; };
-  const [x0, y0] = ara(a);
-  c2d.beginPath();
-  c2d.moveTo(X(x0), Y(y0));
-  for (let i = Math.floor(a) + 1; i < b; i += atla) c2d.lineTo(X(n[i * 2]!), Y(n[i * 2 + 1]!));
-  const [x1, y1] = ara(b);
-  c2d.lineTo(X(x1), Y(y1));
-  c2d.stroke();
-  return [X(x1), Y(y1)] as const;
-}
-/** Her dalın arkasında kendi renginde yumuşak bir ışık; dünya ile birlikte yakınlaşır. */
-const isiklar = [...dugumler.keys()].filter((id) => id !== 'kok' && !yaprakMi(id) && (cocuklar.get(id) ?? []).some(yaprakMi)).map((id) => {
-  const k = kutuHesapla(altlar(id)), renk = getComputedStyle(dugumler.get(id)!).getPropertyValue('--dal').trim();
-  const leke = document.createElement('canvas');
-  leke.width = leke.height = 256;
-  const l = leke.getContext('2d')!, g = l.createRadialGradient(128, 128, 0, 128, 128, 128);
-  g.addColorStop(0, renk + '30');
-  g.addColorStop(0.5, renk + '14');
-  g.addColorStop(1, renk + '00');
-  l.fillStyle = g;
-  l.fillRect(0, 0, 256, 256);
-  return { id, leke, x: k.x + k.w / 2, y: k.y + k.h * 0.42, r: Math.max(k.w, Math.min(k.h, 1400)) * 0.95 };
-});
-function isikCiz(t: number) {
-  isiklar.forEach((i, n) => {
-    const x = X(i.x), y = Y(i.y), r = i.r * kam.z * (1 + 0.05 * Math.sin(t * 0.5 + n * 1.7));
-    if (x + r < 0 || x - r > W || y + r < 0 || y - r > H) return;
-    const parlak = kalici.size ? kalici.has(i.id) : dal === 'kok' || soy(dal).includes(i.id) || soy(i.id).includes(dal);
-    c2d.globalAlpha = Math.min(1, Math.max(0, buyume * 0.6)) * (parlak ? 1 : 0.2);
-    c2d.drawImage(i.leke, x - r, y - r, r * 2, r * 2);
-  });
-  c2d.globalAlpha = 1;
-}
-/** Derinlik veren, farklı hızlarda süzülen tozlar. */
-const tozlar = Array.from({ length: 70 }, (_, i) => { const r = (k: number) => { const s = Math.sin((i + 1) * k) * 43758.5453; return s - Math.floor(s); }; return { x: r(12.9) * 2400, y: r(78.2) * 1600, d: 0.25 + r(37.7) * 0.6, b: 0.6 + r(5.3) * 1.5, f: r(91.1) * 7 }; });
-function tozCiz(t: number) {
-  const en = W + 80, boy = H + 80, olc = Math.sqrt(kam.z);
-  for (const p of tozlar) {
-    const x = (((p.x - kam.x * kam.z * p.d + t * 9 * p.d) % en) + en) % en - 40, y = (((p.y - kam.y * kam.z * p.d - t * 14 * p.d) % boy) + boy) % boy - 40;
-    c2d.globalAlpha = 0.12 + 0.3 * p.d * (0.5 + 0.5 * Math.sin(t * 1.3 + p.f));
-    c2d.fillStyle = '#e9e3d8';
-    c2d.beginPath();
-    c2d.arc(x, y, p.b * Math.min(2.2, 0.7 + olc * 0.6), 0, 7);
-    c2d.fill();
-  }
-  c2d.globalAlpha = 1;
-}
-/** Gölge bulanıklığı yerine üst üste saydam çizgilerle parlama. */
-function parlakIz(n: Float32Array, a: number, b: number, kalin: number, alfa: number) {
-  for (const [kat, o] of [[5, 0.1], [2.6, 0.2], [1, 1]] as const) { c2d.globalAlpha = alfa * o; c2d.lineWidth = kalin * kat; izCiz(n, a, b); }
-}
 function zeminCiz(an: number) {
-  const d = Math.min(devicePixelRatio, 1.25);
-  if (zemin.width !== Math.round(W * d) || zemin.height !== Math.round(H * d)) { zemin.width = Math.round(W * d); zemin.height = Math.round(H * d); }
-  c2d.setTransform(d, 0, 0, d, 0, 0);
-  c2d.clearRect(0, 0, W, H);
-  const t0 = sakin.matches ? 2 : an / 1000;
-  isikCiz(t0);
-  noktaCiz(74, 0.55, 0.07);
-  noktaCiz(56, 1, 0.2);
-  tozCiz(t0);
-  const dalSoyu = kalici.size ? kalici : dal === 'kok' ? null : new Set([...altlar(dal), ...soy(dal)]);
-  c2d.lineCap = c2d.lineJoin = 'round';
-  const t = sakin.matches ? 0 : an / 1000;
-  const gorunur = cizgiler.filter(({ kutu: [a, b, c, e] }) => X(c) > -30 && X(a) < W + 30 && Y(e) > -30 && Y(b) < H + 30);
-  const ilerleme = (c: Cizgi) => Math.min(1, Math.max(0, (buyume - c.gecikme) / 0.75));
-  for (const c of gorunur) {
-    const p = yumusak(ilerleme(c));
-    if (p <= 0) continue;
-    c2d.globalAlpha = dalSoyu && !dalSoyu.has(c.cocuk) ? 0.18 : 1;
-    c2d.strokeStyle = c.sonuk;
-    c2d.lineWidth = Math.max(1.2, 2.4 * Math.min(1, kam.z * 1.2));
-    const [x, y] = izCiz(c.nokta, 0, p);
-    if (p < 1) { c2d.fillStyle = c.renk; c2d.beginPath(); c2d.arc(x, y, 4, 0, 7); c2d.fill(); }
-  }
-  for (const c of gorunur) {
-    const parlak = vurgulu.has(c.cocuk) || kalici.has(c.cocuk);
-    if (ilerleme(c) < 1 || (dalSoyu && !dalSoyu.has(c.cocuk) && !parlak)) continue;
-    c2d.strokeStyle = c.renk;
-    if (parlak) {
-      parlakIz(c.nokta, 0, 1, Math.max(2, 3.6 * Math.min(1, kam.z * 1.2)), 1);
-    }
-    if (!sakin.matches) {
-      const tur = c.boy + 900, yer = ((t * (parlak ? 620 : 250) + c.cocuk.length * 173) % tur) / c.boy;
-      if (yer < 1) {
-        const kuyruk = Math.min(yer, 90 / c.boy);
-        parlakIz(c.nokta, yer - kuyruk, yer, Math.max(2, 4 * Math.min(1, kam.z * 1.2)), 0.95);
-      }
-    }
-  }
-  if (dalga && !sakin.matches) {
-    const gecen = (an - dalga.bas) / 1000;
-    for (const c of gorunur) {
-      if (!dalga.ids.has(c.cocuk)) continue;
-      const p = (gecen - Math.max(0, derinlik(c.cocuk) - dalga.kat - 1) * 0.18 - 0.25) / 0.75;
-      if (p <= 0 || p >= 1.4) continue;
-      c2d.strokeStyle = c.renk;
-      parlakIz(c.nokta, Math.max(0, Math.min(1, p) - 0.45), Math.min(1, p), Math.max(2.5, 5 * Math.min(1, kam.z)), Math.min(1, (1.4 - p) * 2.5));
-    }
-    if (gecen > 2.4) dalga = null;
-  }
-  c2d.globalAlpha = 1;
+  if (dalga && an - dalga.bas > 2600) dalga = null;
+  toprakAlti.ciz(an, {
+    kam, W, H, buyume, dalga, sakin: sakin.matches,
+    parlak: kalici.size ? kalici : dal === 'kok' ? null : new Set([...altlar(dal), ...soy(dal)]),
+    boyali: new Set([...vurgulu, ...kalici]),
+  });
 }
 function kare(an: number) {
   if (acik && kap.hidden) {
     if (buyume < 9) {
       if (!buyumeBasi) buyumeBasi = an;
       buyume = (an - buyumeBasi) / 1000 - 0.15;
-      for (const c of cizgiler) if (buyume > c.gecikme + 0.45) dugumler.get(c.cocuk)?.removeAttribute('data-kapali');
+      for (const c of toprakAlti.cocuklar) if (toprakAlti.buyumeBitti(c, buyume)) dugumler.get(c)?.removeAttribute('data-kapali');
       if (buyume > 3.2) buyume = 9;
     }
     if (!ucus && hedefY !== null) {
@@ -515,7 +390,6 @@ tuval.addEventListener('pointerdown', (e) => {
   if (acik && e.pointerType !== 'mouse') parmak = { y: e.clientY, toplam: 0, hiz: 0 };
 });
 addEventListener('pointermove', (e) => {
-  fare = { x: e.clientX, y: e.clientY };
   if (!acik || !parmak) return;
   const dy = parmak.y - e.clientY;
   parmak = { y: e.clientY, toplam: parmak.toplam + Math.abs(dy), hiz: dy };
@@ -536,7 +410,7 @@ tuval.addEventListener('pointerover', (e) => {
   if (mesgul) return;
   vurgula(d && d.dataset['dugum'] !== 'kok' ? d.dataset['dugum']! : null);
   hizliSahne(d?.querySelector('canvas') ?? null);
-  if (d instanceof HTMLAnchorElement && d.hasAttribute('data-kart')) void getir(d.pathname).catch(() => undefined);
+  if (d instanceof HTMLAnchorElement && d.hasAttribute('data-kart') && !d.hasAttribute('data-kendi')) void getir(d.pathname).catch(() => undefined);
 });
 tuval.addEventListener('focusin', (e) => {
   const d = e.target instanceof Element ? e.target.closest<HTMLElement>('[data-dugum]') : null;
@@ -644,7 +518,7 @@ if (dugumler.has(ilkKimlik) && ilkKimlik !== 'kok') {
     else { kam = dalGorunumu(hedef); uygula(); }
   }
 } else if (acik && buyume < 9) {
-  for (const c of cizgiler) dugumler.get(c.cocuk)!.setAttribute('data-kapali', '');
+  for (const c of toprakAlti.cocuklar) dugumler.get(c)!.setAttribute('data-kapali', '');
   kam = { ...dalGorunumu('kok') };
   const son = { ...kam };
   kam = { ...kam, z: kam.z * 1.5, y: yerler.get('kok')!.y + 260 };

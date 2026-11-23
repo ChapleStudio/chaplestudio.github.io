@@ -2,6 +2,7 @@ import { getCollection, type CollectionEntry, type CollectionKey } from 'astro:c
 import { acikBolumler, type Bolum } from '../site';
 import type { IsVerisi, TurKimligi, YaziVerisi } from '../turler/semalar';
 import { etiketleriDiz, gruptakiler, type Etiket } from '../etiketler';
+import type { Tema } from '../temalar/tema';
 import { altAdi, kategoriler, kategoriKimlikleri } from '../turler/is/kategoriler';
 
 export type Girdi = CollectionEntry<CollectionKey>;
@@ -43,6 +44,8 @@ interface OrtakKayit extends DugumBilgisi {
   baslik: string;
   ozet: string;
   eskiAdresler: string[];
+  tema: Tema;
+  kendiSitesi: boolean;
   girdi: Girdi;
 }
 
@@ -85,8 +88,8 @@ const dugumBilgisi: { [T in TurKimligi]: (v: VeriTipleri[T]) => DugumBilgisi } =
 function kaydaCevir<T extends TurKimligi>(bolum: Bolum, tur: T, girdi: Girdi): OrtakKayit & { tur: T; veri: VeriTipleri[T] } {
   // Tek tip sınırı: içerik, content.config.ts içinde aynı türün şemasıyla doğrulanmış olarak gelir.
   const veri = girdi.data as VeriTipleri[T];
-  const { baslik, ozet, eskiAdresler } = veri;
-  return { tur, veri, bolum, girdi, id: girdi.id, yol: `/${bolum.id}/${girdi.id}/`, baslik, ozet, eskiAdresler, ...dugumBilgisi[tur](veri) };
+  const { baslik, ozet, eskiAdresler, tema, kendiSitesi } = veri;
+  return { tur, veri, bolum, girdi, id: girdi.id, yol: kendiSitesi ?? `/${bolum.id}/${girdi.id}/`, kendiSitesi: kendiSitesi !== undefined, tema, baslik, ozet, eskiAdresler, ...dugumBilgisi[tur](veri) };
 }
 
 const yenidenEskiye = (a: Kayit, b: Kayit) => b.tarih.getTime() - a.tarih.getTime() || a.baslik.localeCompare(b.baslik, 'tr');

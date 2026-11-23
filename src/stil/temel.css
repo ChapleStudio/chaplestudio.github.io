@@ -1,13 +1,19 @@
 @import './renkler.css';
-/* Yazı tipi önden yüklenir (Sayfa.astro) ve yedekle değişmez: yükleninceye kadar yer tutar. */
-@font-face { font-family: 'Schibsted Grotesk Variable'; font-style: normal; font-display: block; font-weight: 400 900; src: url('@fontsource-variable/schibsted-grotesk/files/schibsted-grotesk-latin-ext-wght-normal.woff2') format('woff2-variations'); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
-@font-face { font-family: 'Schibsted Grotesk Variable'; font-style: normal; font-display: block; font-weight: 400 900; src: url('@fontsource-variable/schibsted-grotesk/files/schibsted-grotesk-latin-wght-normal.woff2') format('woff2-variations'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+/* Yazı tipleri önden yüklenir (Sayfa.astro) ve yedekle değişmez. */
+@font-face { font-family: 'Grenze Variable'; font-display: block; font-weight: 100 900; src: url('@fontsource-variable/grenze/files/grenze-latin-ext-wght-normal.woff2') format('woff2-variations'); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'Alegreya Sans'; font-display: block; font-weight: 400; src: url('@fontsource/alegreya-sans/files/alegreya-sans-latin-ext-400-normal.woff2') format('woff2'); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'Alegreya Sans'; font-display: block; font-weight: 500; src: url('@fontsource/alegreya-sans/files/alegreya-sans-latin-ext-500-normal.woff2') format('woff2'); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'Alegreya Sans'; font-display: block; font-weight: 700; src: url('@fontsource/alegreya-sans/files/alegreya-sans-latin-ext-700-normal.woff2') format('woff2'); unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF; }
+@font-face { font-family: 'Grenze Variable'; font-display: block; font-weight: 100 900; src: url('@fontsource-variable/grenze/files/grenze-latin-wght-normal.woff2') format('woff2-variations'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: 'Alegreya Sans'; font-display: block; font-weight: 400; src: url('@fontsource/alegreya-sans/files/alegreya-sans-latin-400-normal.woff2') format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: 'Alegreya Sans'; font-display: block; font-weight: 500; src: url('@fontsource/alegreya-sans/files/alegreya-sans-latin-500-normal.woff2') format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: 'Alegreya Sans'; font-display: block; font-weight: 700; src: url('@fontsource/alegreya-sans/files/alegreya-sans-latin-700-normal.woff2') format('woff2'); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
 
 *, *::before, *::after { box-sizing: border-box; }
 * { margin: 0; }
 :root { --kenar: clamp(1.25rem, 5vw, 5rem); --cikis: cubic-bezier(0.16, 1, 0.3, 1); scrollbar-color: var(--cizgi) var(--zemin); }
-html { background: var(--zemin); color: var(--kemik); font: 400 1.0625rem/1.6 'Schibsted Grotesk Variable', system-ui, sans-serif; -webkit-text-size-adjust: 100%; }
-h1, h2, h3 { font-weight: 750; line-height: 1.02; letter-spacing: -0.04em; text-wrap: balance; }
+html { background: var(--zemin); color: var(--kemik); font: 400 1.1875rem/1.55 var(--metin); -webkit-text-size-adjust: 100%; }
+h1, h2, h3 { font-family: var(--baslik); font-weight: 600; line-height: 1.02; letter-spacing: 0; text-wrap: balance; }
 p, li { text-wrap: pretty; }
 a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 0.07em; }
 img, canvas { display: block; max-width: 100%; }
@@ -23,26 +29,30 @@ button, input, select { font: inherit; color: inherit; }
 #icerik:focus { outline: none; }
 
 /* Kapsül: sitedeki tek üst çubuk */
-.kapsul { display: flex; gap: 0.2rem; padding: 0.35rem; border-radius: 99px; background: #171615f2; border: 1.5px solid var(--cizgi); max-width: calc(100vw - 1.5rem); overflow-x: auto; scrollbar-width: none; }
-.kapsul a, .kapsul button { flex: none; display: inline-flex; align-items: center; gap: 0.5rem; min-height: 2.5rem; padding: 0 1rem; border: 0; border-radius: 99px; background: none; text-decoration: none; cursor: pointer; white-space: nowrap; transition: background-color 160ms, color 160ms; }
+.kapsul { display: flex; gap: 0.1rem; padding: 0.3rem; border-radius: var(--kose); background: var(--yuzey); border: 2px solid var(--cizgi); color: var(--kemik); max-width: calc(100vw - 1.5rem); overflow-x: auto; scrollbar-width: none; }
+.kapsul a, .kapsul button { flex: none; display: inline-flex; align-items: center; gap: 0.5rem; min-height: 2.5rem; padding: 0 1rem; border: 0; border-radius: var(--kose); background: none; text-decoration: none; cursor: pointer; white-space: nowrap; font-weight: 500; transition: background-color 160ms, color 160ms; }
 .kapsul a:not([aria-current]):hover, .kapsul button:hover { background: var(--yuzey-2); }
-.kapsul [aria-current] { background: var(--dal); color: var(--zemin); font-weight: 600; }
+.kapsul [aria-current] { background: var(--dal); color: #1d1218; font-weight: 700; }
 .kapsul svg { color: var(--dal); }
 .kapsul [aria-current] svg { color: inherit; }
 
 /* Oda: bir projenin içi. Tuvalin içinden de, doğrudan adresinden de aynı görünür. */
-.oda-giris { position: relative; min-height: 100svh; display: grid; grid-template-rows: auto 1fr auto; overflow: hidden; isolation: isolate; background: radial-gradient(90% 75% at 62% 30%, color-mix(in srgb, var(--dal) 20%, var(--zemin)), var(--zemin) 75%); }
+.oda-giris { position: relative; min-height: 100svh; display: grid; grid-template-rows: auto 1fr auto; overflow: hidden; isolation: isolate; background: color-mix(in srgb, var(--dal) 13%, var(--zemin)); }
+.oda-arka { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; z-index: -2; }
+.oda-sus { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.oda-sus svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.oda { background: var(--zemin); font-family: var(--metin); }
 .oda-sahne { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -2; }
-.oda-giris::after { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(0deg, var(--zemin) 10%, #0b0b0bcc 32%, #0b0b0b00 58%); pointer-events: none; }
+.oda-giris::after { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(0deg, var(--zemin) 10%, transparent 56%); pointer-events: none; }
 .oda-ust { padding: 1.1rem var(--kenar) 0; display: flex; justify-content: center; }
 .oda-baslik { grid-row: 3; padding-bottom: clamp(2rem, 7vh, 5rem); }
-.oda-baslik h1 { font-size: clamp(3rem, 9.5vw, 8.5rem); letter-spacing: -0.055em; line-height: 0.92; overflow-wrap: break-word; }
+.oda-baslik h1 { font-size: clamp(3rem, 9.5vw, 8.5rem); font-weight: 700; line-height: 0.95; overflow-wrap: break-word; }
 .oda-baslik h1:focus { outline: none; }
-.oda-baslik > p { max-width: 42rem; margin-top: 1.4rem; font-size: clamp(1.125rem, 1.8vw, 1.4rem); line-height: 1.45; }
+.konusma > p { max-width: 42rem; margin-top: 1.4rem; font-size: clamp(1.125rem, 1.8vw, 1.4rem); line-height: 1.45; }
 .eylem { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-top: 1.8rem; }
-.dugme { display: inline-flex; align-items: center; gap: 0.6rem; min-height: 3rem; padding: 0.4rem 1.3rem; border-radius: 99px; border: 1.5px solid var(--kemik); text-decoration: none; font-weight: 600; transition: background-color 160ms, color 160ms, border-color 160ms; }
+.dugme { display: inline-flex; align-items: center; gap: 0.6rem; min-height: 3rem; padding: 0.4rem 1.3rem; border-radius: var(--kose); border: 2px solid var(--kemik); text-decoration: none; font-weight: 700; transition: background-color 160ms, color 160ms, border-color 160ms; }
 .dugme:hover { background: var(--kemik); color: var(--zemin); }
-.dugme.asil { background: var(--dal); border-color: var(--dal); color: var(--zemin); }
+.dugme.asil { background: var(--dal); border-color: var(--dal); color: #1d1218; }
 .dugme.asil:hover { background: var(--kemik); border-color: var(--kemik); }
 .oda-govde { display: grid; gap: 3rem; padding-block: 3.5rem 5rem; }
 .kunye { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(10rem, 100%), 1fr)); gap: 1.5rem; align-content: start; }
@@ -50,9 +60,9 @@ button, input, select { font: inherit; color: inherit; }
 .kunye dd { margin: 0; font-weight: 600; }
 .kunye .etiketler { margin-top: 0.35rem; }
 .oda figure { margin: 0; }
-figure img { width: 100%; border-radius: 12px; border: 1.5px solid var(--cizgi); }
+figure img { width: 100%; border-radius: 3px; border: 2px solid var(--cizgi); }
 figcaption { color: var(--soluk); margin-top: 0.7rem; }
-.yazi { max-width: 66ch; font-size: 1.125rem; }
+.yazi { max-width: 66ch; font-size: 1.25rem; }
 figure + .yazi { margin-top: 3rem; }
 .yazi > * + * { margin-top: 1em; }
 .yazi > h2 { font-size: 2rem; margin-top: 2.2em; }
@@ -71,25 +81,25 @@ figure + .yazi { margin-top: 3rem; }
 
 /* Etiket */
 .etiketler { display: flex; flex-wrap: wrap; gap: 0.45rem; }
-.etiket { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 2.1rem; padding: 0 0.8rem; border: 1.5px solid #4d4740; border-radius: 99px; text-decoration: none; font-size: 0.95rem; font-weight: 500; line-height: 1.2; background: none; cursor: pointer; transition: border-color 160ms, background-color 160ms, color 160ms; }
+.etiket { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 2.1rem; padding: 0 0.75rem; border: 1.5px solid var(--cizgi); border-radius: 4px 11px 11px 4px; color: var(--kemik); text-decoration: none; font-size: 1.02rem; font-weight: 500; line-height: 1.2; background: none; cursor: pointer; transition: border-color 160ms, background-color 160ms, color 160ms; }
 .etiket:hover, .etiket:focus-visible { border-color: var(--dal); }
 .etiket[aria-pressed='true'] { background: var(--kemik); border-color: var(--kemik); color: var(--zemin); }
 .etiket[aria-disabled='true'] { opacity: 0.35; cursor: default; }
 .etiket .adet { color: var(--soluk); font-variant-numeric: tabular-nums; font-size: 0.88rem; }
 .etiket[aria-pressed='true'] .adet { color: inherit; }
 .etiketcik { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.5rem; }
-.etiketcik > span { padding: 0.12rem 0.55rem; border-radius: 99px; background: var(--yuzey-2); color: var(--soluk); font-size: 0.82rem; line-height: 1.4; }
+.etiketcik > span { padding: 0.1rem 0.55rem; border-radius: 3px 8px 8px 3px; background: var(--yuzey-2); color: var(--soluk); font-size: 0.9rem; line-height: 1.4; }
 .sayfa-ic { padding-block: 3rem 6rem; }
-.sayfa-ic > h1 { font-size: clamp(2.6rem, 8vw, 6rem); letter-spacing: -0.055em; overflow-wrap: anywhere; }
+.sayfa-ic > h1 { font-size: clamp(2.6rem, 8vw, 6rem); font-weight: 700; overflow-wrap: anywhere; }
 
 /* Kart: ağaçtaki proje düğümü */
-.kart { display: flex; flex-direction: column; border: 1.5px solid #4d4740; border-radius: 16px; background: var(--yuzey); overflow: hidden; text-decoration: none; position: relative; transition: border-color 200ms, box-shadow 200ms; }
-.kart:hover, .kart:focus-visible { border-color: var(--dal); box-shadow: 0 18px 50px -18px var(--dal); }
-.kart .gorsel { display: block; position: relative; flex: 1; min-height: 9.5rem; background: #0f0e0e; }
+.kart { display: flex; flex-direction: column; border: 2px solid var(--cizgi); border-radius: var(--kose); background: var(--yuzey); color: var(--kemik); overflow: hidden; text-decoration: none; position: relative; transition: border-color 200ms, box-shadow 200ms; }
+.kart:hover, .kart:focus-visible { border-color: var(--dal); }
+.kart .gorsel { display: block; position: relative; flex: 1; min-height: 9.5rem; background: var(--sahne-zemin); }
 .kart canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
 .kart .ad { display: block; padding: 0.75rem 1rem 0.9rem; }
-.kart strong { display: block; font-size: 1.2rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; }
+.kart strong { display: block; font-family: var(--baslik); font-size: 1.4rem; font-weight: 600; line-height: 1.1; }
 .kart .alt { display: block; color: var(--soluk); font-size: 0.9rem; line-height: 1.35; margin-top: 0.25rem; }
-.kart .suruyor { position: absolute; right: 0.8rem; top: 0.8rem; width: 0.65rem; height: 0.65rem; border-radius: 50%; background: var(--dal); box-shadow: 0 0 0 4px #0b0b0b99; }
+.kart .suruyor { position: absolute; right: 0.8rem; top: 0.8rem; width: 0.65rem; height: 0.65rem; border-radius: 50%; background: var(--dal); box-shadow: 0 0 0 4px var(--sahne-zemin); }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation-duration: 0.01ms !important; } }

@@ -18,7 +18,7 @@ export interface Cizgi { cocuk: string; yol: string; renk: Renk }
 export interface Yerlesim { yerler: Map<string, Yer>; cizgiler: Cizgi[] }
 
 export const OLCU = {
-  kok: { w: 1180, h: 250 },
+  kok: { w: 1180, h: 300 },
   dal: { w: 372, h: 88 },
   kart: { w: 272, h: 250 },
   genis: { w: 520, h: 350 },

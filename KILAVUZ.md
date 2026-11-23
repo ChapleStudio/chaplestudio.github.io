@@ -14,6 +14,16 @@ npm run yeni -- isler "Oyunumun Adı"
 - **Etiket neyle, nerede, nasıl olduğunu söyler**: `src/etiketler.ts`. Beş grup var: türü, özellikleri, yapıldığı araç, yazılım dili, platform. Her işte en az bir tür, bir dil ve bir platform etiketi zorunlu. Sözlükte olmayan etiket derlemeyi durdurur.
 - Etiket eklenince sayfası (`/etiket/<ad>/`), ağaçtaki süzgeci ve liste süzgeci kendiliğinden oluşur.
 
+## Projeye kendi temasını vermek
+
+Üç seviye var, hepsi `src/temalar/tema.ts` içinde anlatılı:
+
+1. **Renk, yazı, çerçeve:** `temaKimlikleri` listesine adı ekle, `src/temalar/kartlar.css`'e düğüm rengini, `src/temalar/<ad>/oda.css`'e sayfanın stilini yaz. Sayfa yalnız kendi temasının dosyasını indirir.
+2. **Özel sahne:** `src/temalar/<ad>/Sus.astro` yaz, `src/bilesenler/OdaGiris.astro` içinde temaya bağla.
+3. **Kendi sitesi:** Hazır siteyi `public/<yol>/` klasörüne koy, içeriğe `kendiSitesi: /<yol>/` yaz. Düğüm ağaçta durur, içine girilince o site açılır; tasarımına dokunulmaz. O sitede dönüş için `/#isler/<dosya-adı>` bağlantısı yeter.
+
+İçerikte `tema: <ad>` yazmak yeterli. Erişilebilirlik denetimi bütün temalarda çalışır.
+
 ## Düğümün canlı sahnesi
 
 `sahne:` alanına `src/tuval/sahne-kimlikleri.ts` içindeki adlardan birini yaz. Boş bırakırsan ada özgü bir desen çizilir. Yeni sahne için adı oraya, çizimi `src/tuval/sahneler.ts` içine ekle.

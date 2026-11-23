@@ -22,7 +22,7 @@ const [kapak, ...digerleri] = v.gorseller;
     </ul>
   )}
 </OdaGiris>
-<div class="sar oda-govde" data-renk={kayit.dal.renk}>
+<div class="sar oda-govde">
   <dl class="kunye">
     <div><dt>Kategori</dt><dd>{kayit.altDal ? `${kayit.dal.ad}, ${kayit.altDal.ad}` : kayit.dal.ad}</dd></div>
     {grupSirasi.map((g) => { const e = gruptakiler(kayit.etiketler, g); return e.length > 0 && <div><dt>{etiketGruplari[g].ad}</dt><dd><Etiketler etiketler={e} /></dd></div>; })}

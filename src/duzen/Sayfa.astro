@@ -1,12 +1,15 @@
 ---
-import latin from '@fontsource-variable/schibsted-grotesk/files/schibsted-grotesk-latin-wght-normal.woff2?url';
-import latinEk from '@fontsource-variable/schibsted-grotesk/files/schibsted-grotesk-latin-ext-wght-normal.woff2?url';
+import baslikYazi from '@fontsource-variable/grenze/files/grenze-latin-wght-normal.woff2?url';
+import metinYazi from '@fontsource/alegreya-sans/files/alegreya-sans-latin-400-normal.woff2?url';
+import metinEk from '@fontsource/alegreya-sans/files/alegreya-sans-latin-ext-400-normal.woff2?url';
 import '../stil/temel.css';
 import '../stil/tuval.css';
+import '../temalar/kartlar.css';
+import { temaStili, type Tema } from '../temalar/tema';
 import { acikBolumler, site } from '../site';
 
-interface Props { baslik?: string; aciklama?: string; gorsel?: string; tur?: 'website' | 'article'; dizinleme?: boolean; ust?: boolean }
-const { baslik, aciklama = site.aciklama, gorsel = '/paylasim.png', tur = 'website', dizinleme = true, ust = true } = Astro.props;
+interface Props { baslik?: string; aciklama?: string; gorsel?: string; tur?: 'website' | 'article'; dizinleme?: boolean; ust?: boolean; tema?: Tema }
+const { baslik, aciklama = site.aciklama, gorsel = '/paylasim.png', tur = 'website', dizinleme = true, ust = true, tema = 'studyo' } = Astro.props;
 const tamBaslik = baslik ? `${baslik} | ${site.ad}` : site.ad;
 const asil = new URL(Astro.url.pathname, Astro.site).href;
 const yol = Astro.url.pathname;
@@ -19,12 +22,11 @@ const yol = Astro.url.pathname;
     <title>{tamBaslik}</title>
     <meta name="description" content={aciklama} />
     {dizinleme ? <link rel="canonical" href={asil} /> : <meta name="robots" content="noindex" />}
-    <link rel="preload" href={latin} as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href={latinEk} as="font" type="font/woff2" crossorigin />
+    {[baslikYazi, metinYazi, metinEk].map((y) => <link rel="preload" href={y} as="font" type="font/woff2" crossorigin />)}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="alternate" type="application/rss+xml" title={site.ad} href="/rss.xml" />
     <link rel="sitemap" href="/sitemap-index.xml" />
-    <meta name="theme-color" content="#0b0b0b" />
+    <meta name="theme-color" content="#1d1218" />
     <meta property="og:site_name" content={site.ad} />
     <meta property="og:type" content={tur} />
     <meta property="og:locale" content="tr_TR" />
@@ -33,6 +35,7 @@ const yol = Astro.url.pathname;
     <meta property="og:url" content={asil} />
     <meta property="og:image" content={new URL(gorsel, Astro.site).href} />
     <meta name="twitter:card" content="summary_large_image" />
+    {temaStili(tema) && <link rel="stylesheet" href={temaStili(tema)} data-tema-stili />}
     <slot name="bas" />
   </head>
   <body>

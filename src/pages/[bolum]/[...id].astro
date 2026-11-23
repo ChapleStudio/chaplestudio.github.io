@@ -10,7 +10,7 @@ import { bolumKayitlari } from '../../kutuphane/kayit';
 export const getStaticPaths = (async () => {
   const bolumler = await Promise.all(acikBolumler.map(bolumKayitlari));
   return bolumler.flatMap((kayitlar) =>
-    kayitlar.map((kayit) => ({
+    kayitlar.filter((kayit) => !kayit.kendiSitesi).map((kayit) => ({
       params: { bolum: kayit.bolum.id, id: kayit.id },
       props: { kayit, komsular: kayitlar.filter((k) => k.dal.id === kayit.dal.id && k.id !== kayit.id).slice(0, 4) },
     })),
@@ -20,8 +20,8 @@ const { kayit, komsular } = Astro.props;
 const kapak = kayit.tur === 'is' ? kayit.veri.gorseller[0] : undefined;
 const gorsel = kapak && (await getImage({ src: kapak.dosya, width: 1200, format: 'jpeg', layout: 'none' })).src;
 ---
-<Sayfa baslik={kayit.baslik} aciklama={kayit.ozet} tur="article" ust={false} {...gorsel ? { gorsel } : {}}>
-  <article class="oda">
+<Sayfa tema={kayit.tema} baslik={kayit.baslik} aciklama={kayit.ozet} tur="article" ust={false} {...gorsel ? { gorsel } : {}}>
+  <article class="oda" data-renk={kayit.dal.renk} data-tema={kayit.tema}>
     {kayit.tur === 'is' ? <IsDetay kayit={kayit} /> : <YaziDetay kayit={kayit} />}
     {komsular.length > 0 && (
       <section class="sar komsular" aria-labelledby="komsu">

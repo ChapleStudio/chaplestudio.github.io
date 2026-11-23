@@ -14,15 +14,15 @@ export const olcekVer = (z: number) => { olcek = z; };
 export const bekletSahneleri = (b: boolean) => { bekle = b; };
 export const hizliSahne = (c: HTMLCanvasElement | null) => { hizli = c; };
 
-const karis = (renk: string, oran: number) => {
-  const n = parseInt(renk.slice(1), 16), z = [20, 19, 18];
+const karis = (renk: string, koyu: string, oran: number) => {
+  const n = parseInt(renk.slice(1), 16), m = parseInt(koyu.slice(1), 16), z = [m >> 16, (m >> 8) & 255, m & 255];
   const k = [n >> 16, (n >> 8) & 255, n & 255].map((v, i) => Math.round(v * oran + z[i]! * (1 - oran)));
   return `rgb(${k.join(',')})`;
 };
 export function paletAl(el: Element): Palet {
   const s = getComputedStyle(el), v = (ad: string) => s.getPropertyValue(ad).trim();
   const vurgu = v('--dal');
-  return { zemin: '#0f0e0e', kemik: v('--kemik'), soluk: '#8d867c', vurgu, koyu: karis(vurgu, 0.24) };
+  return { zemin: v('--sahne-zemin'), kemik: v('--kemik'), soluk: v('--soluk'), vurgu, koyu: karis(vurgu, v('--sahne-zemin'), 0.24) };
 }
 
 const gozcu = new IntersectionObserver((g) => g.forEach((e) => {
