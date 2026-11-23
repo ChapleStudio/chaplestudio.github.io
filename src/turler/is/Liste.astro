@@ -1,0 +1,120 @@
+---
+import Ikon from '../../bilesenler/Ikon.astro';
+import { ayYilYaz, isoGun, type IsKaydi } from '../../kutuphane/kayit';
+import { cesitler, cesitKimlikleri } from './cesitler';
+interface Props { kayitlar: IsKaydi[] }
+const { kayitlar } = Astro.props;
+const satirlar = kayitlar.map((k) => ({ k, v: k.veri }));
+const doluCesitler = cesitKimlikleri.filter((c) => satirlar.some(({ v }) => v.cesit === c));
+const sirala = (d: string[]) => [...new Set(d)].sort((a, b) => a.localeCompare(b, 'tr'));
+const teknolojiler = sirala(satirlar.flatMap(({ v }) => v.teknoloji));
+const durum = (v: (typeof satirlar)[number]['v']) =>
+  v.suruyor ? 'Üzerinde çalışıyorum' : v.baglantilar.some((b) => b.tur === 'indir' || b.tur === 'oyna') ? 'İndirilebilir' : 'Kaynak kodu açık';
+---
+<form class="suzgec" data-suzgec hidden role="search" aria-label="İşleri süz">
+  <label class="ara"><span>Ara</span><span class="alan"><Ikon ad="ara" /><input type="search" name="ara" autocomplete="off" placeholder="Rust, oyun, Android" /></span></label>
+  <label><span>Çeşit</span><select name="cesit"><option value="">Hepsi</option>{doluCesitler.map((c) => <option value={c}>{cesitler[c].ad}</option>)}</select></label>
+  <label><span>Teknoloji</span><select name="teknoloji"><option value="">Hepsi</option>{teknolojiler.map((t) => <option value={t}>{t}</option>)}</select></label>
+  <p class="sayi" role="status" data-sayi>{kayitlar.length} iş</p>
+</form>
+<ul class="liste" role="list" data-liste>
+  {satirlar.map(({ k, v }) => (
+    <li data-cesit={v.cesit} data-teknoloji={JSON.stringify(v.teknoloji)} data-metin={[k.baslik, k.ozet, k.turAdi, ...v.teknoloji, ...v.platform].join(' ')}>
+      <span class="renk" data-renk={k.renk}><Ikon ad={k.ikon} boy={22} /></span>
+      <div class="ana">
+        <h2><a href={k.yol}>{k.baslik}</a></h2>
+        <p>{k.ozet}</p>
+      </div>
+      <p class="yan">{k.turAdi}<br />{v.teknoloji.join(', ')}</p>
+      <p class="yan">{durum(v)}<br /><time datetime={isoGun(k.tarih)}>{ayYilYaz(k.tarih)}</time></p>
+    </li>
+  ))}
+</ul>
+<p class="bos" data-bos hidden>Bu süzgece uyan iş yok. <button type="button" data-temizle>Süzgeci temizle</button></p>
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-suzgec]');
+  const liste = document.querySelector('[data-liste]');
+  if (form && liste) {
+    const satirlar = [...liste.querySelectorAll<HTMLElement>('li')];
+    const sayi = form.querySelector('[data-sayi]');
+    const bos = document.querySelector<HTMLElement>('[data-bos]');
+    /** Türkçe harf ve aksan duyarsız arama: "gorsel" yazan "görsel"i bulur. */
+    const sade = (m: string) => m.toLocaleLowerCase('tr').normalize('NFD').replace(/\p{M}/gu, '').replaceAll('ı', 'i');
+    const alanlar = ['ara', 'cesit', 'teknoloji'] as const;
+    const metinler = new Map(satirlar.map((s) => [s, sade(s.dataset.metin ?? '')]));
+    const deger = (ad: string) => String(new FormData(form).get(ad) ?? '').trim();
+
+    const suz = (adresiYaz: boolean) => {
+      const sozcukler = sade(deger('ara')).split(/\s+/).filter(Boolean);
+      const cesit = deger('cesit');
+      const teknoloji = deger('teknoloji');
+      let kalan = 0;
+      for (const s of satirlar) {
+        const uyar =
+          (!cesit || s.dataset.cesit === cesit) &&
+          (!teknoloji || (JSON.parse(s.dataset.teknoloji ?? '[]') as string[]).includes(teknoloji)) &&
+          sozcukler.every((p) => metinler.get(s)!.includes(p));
+        s.hidden = !uyar;
+        if (uyar) kalan++;
+      }
+      if (sayi) sayi.textContent = `${kalan} iş`;
+      if (bos) bos.hidden = kalan > 0;
+      if (adresiYaz) {
+        const p = new URLSearchParams();
+        for (const a of alanlar) if (deger(a)) p.set(a, deger(a));
+        history.replaceState(null, '', p.size ? `?${p}` : location.pathname);
+      }
+    };
+    const adrestenOku = () => {
+      const p = new URLSearchParams(location.search);
+      for (const a of alanlar) {
+        const alan = form.elements.namedItem(a);
+        if (alan instanceof HTMLInputElement) alan.value = p.get(a) ?? '';
+        if (alan instanceof HTMLSelectElement) {
+          alan.value = p.get(a) ?? '';
+          if (alan.selectedIndex < 0) alan.value = '';
+        }
+      }
+      suz(false);
+    };
+    form.hidden = false;
+    form.addEventListener('input', () => suz(true));
+    form.addEventListener('submit', (e) => e.preventDefault());
+    document.querySelector('[data-temizle]')?.addEventListener('click', () => {
+      form.reset();
+      for (const a of alanlar) {
+        const alan = form.elements.namedItem(a);
+        if (alan instanceof HTMLInputElement || alan instanceof HTMLSelectElement) alan.value = '';
+      }
+      suz(true);
+      form.querySelector('input')?.focus();
+    });
+    addEventListener('popstate', adrestenOku);
+    adrestenOku();
+  }
+</script>
+<style>
+  .suzgec { display: grid; gap: 1rem; align-items: end; margin-bottom: 2rem; }
+  .suzgec[hidden] { display: none; }
+  .suzgec label { display: grid; gap: 0.3rem; font-weight: 600; min-width: 0; }
+  .alan { display: flex; align-items: center; gap: 0.5rem; padding-left: 0.8rem; }
+  .alan, select { background: var(--yuzey); border: 2px solid var(--soluk); border-radius: 2px; min-height: 2.9rem; font-weight: 400; min-width: 0; }
+  .alan input { flex: 1; min-width: 0; border: 0; background: none; height: 2.6rem; padding: 0 0.6rem 0 0; outline: none; caret-color: var(--zinober); }
+  .alan:focus-within { outline: 3px solid var(--odak); outline-offset: 3px; }
+  input::placeholder { color: var(--soluk); opacity: 1; }
+  select { padding: 0 0.7rem; width: 100%; }
+  .sayi { font-variant-numeric: tabular-nums; padding-bottom: 0.7rem; color: var(--soluk); }
+  .liste { border-bottom: 2px solid var(--cizgi); }
+  .liste li { display: grid; grid-template-columns: 2.75rem minmax(0, 1fr); gap: 0.4rem 1.1rem; padding-block: 1.25rem; border-top: 2px solid var(--cizgi); position: relative; }
+  .liste li[hidden] { display: none; }
+  .renk { grid-row: 1 / span 3; background: var(--kutu); color: var(--kutu-yazi); display: grid; place-items: center; min-height: 3.5rem; border-radius: 2px; }
+  .ana h2 { font-size: 2rem; margin-bottom: 0.3rem; }
+  .ana h2 a { text-decoration: none; }
+  .ana h2 a::after { content: ''; position: absolute; inset: 0; }
+  .liste li:hover h2 a { text-decoration: underline; }
+  .yan { color: var(--soluk); font-size: 1rem; line-height: 1.45; }
+  .bos { padding-block: 2rem; font-size: 1.1875rem; }
+  .bos button { border: 0; background: none; padding: 0.4rem 0; font-weight: 600; text-decoration: underline; cursor: pointer; }
+  @media (min-width: 40rem) { .suzgec { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) 4.5rem; } }
+  @media (min-width: 60rem) { .liste li { grid-template-columns: 3.5rem minmax(0, 1fr) 14rem 12rem; gap: 0 2rem; } .renk { grid-row: auto; } }
+</style>

@@ -1,0 +1,35 @@
+---
+import type { GetStaticPaths } from 'astro';
+import { getImage } from 'astro:assets';
+import Sayfa from '../../duzen/Sayfa.astro';
+import IsDetay from '../../turler/is/Detay.astro';
+import YaziDetay from '../../turler/yazi/Detay.astro';
+import { acikBolumler } from '../../site';
+import { bolumKayitlari } from '../../kutuphane/kayit';
+export const getStaticPaths = (async () => {
+  const bolumler = await Promise.all(acikBolumler.map(bolumKayitlari));
+  return bolumler.flatMap((kayitlar) =>
+    kayitlar.map((kayit, i) => ({
+      params: { bolum: kayit.bolum.id, id: kayit.id },
+      props: { kayit, onceki: kayitlar[i - 1], sonraki: kayitlar[i + 1] },
+    })),
+  );
+}) satisfies GetStaticPaths;
+const { kayit, onceki, sonraki } = Astro.props;
+const kapak = kayit.tur === 'is' ? kayit.veri.gorseller[0] : undefined;
+const gorsel = kapak && (await getImage({ src: kapak.dosya, width: 1200, format: 'jpeg', layout: 'none' })).src;
+---
+<Sayfa baslik={kayit.baslik} aciklama={kayit.ozet} tur="article" {...gorsel ? { gorsel } : {}}>
+  {kayit.tur === 'is' ? <IsDetay kayit={kayit} /> : <YaziDetay kayit={kayit} />}
+  <nav class="sar komsu" aria-label="Raftaki komşular">
+    {onceki ? <a href={onceki.yol} data-renk={onceki.renk}><span>Solundaki kutu</span><strong>{onceki.baslik}</strong></a> : <span></span>}
+    {sonraki && <a href={sonraki.yol} data-renk={sonraki.renk} class="sag"><span>Sağındaki kutu</span><strong>{sonraki.baslik}</strong></a>}
+  </nav>
+</Sayfa>
+<style>
+  .komsu { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 5rem; }
+  .komsu a { display: grid; gap: 0.3rem; padding: 1.1rem 1.25rem; background: var(--kutu); color: var(--kutu-yazi); text-decoration: none; border-radius: 2px; min-width: 0; }
+  .komsu .sag { text-align: right; }
+  .komsu strong { font: 800 clamp(1.5rem, 4vw, 2.25rem)/1 var(--baslik); overflow-wrap: anywhere; }
+  .komsu a:hover strong { text-decoration: underline; text-decoration-thickness: 0.06em; }
+</style>

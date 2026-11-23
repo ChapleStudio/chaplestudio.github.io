@@ -1,0 +1,21 @@
+---
+import { isoGun, tarihYaz, type YaziKaydi } from '../../kutuphane/kayit';
+interface Props { kayitlar: YaziKaydi[] }
+const { kayitlar } = Astro.props;
+---
+<ul role="list">
+  {kayitlar.map((k) => (
+    <li>
+      <h2><a href={k.yol}>{k.baslik}</a></h2>
+      <p>{k.ozet}</p>
+      <p class="tarih"><time datetime={isoGun(k.tarih)}>{tarihYaz(k.tarih)}</time></p>
+    </li>
+  ))}
+</ul>
+<style>
+  li { padding-block: 1.5rem; border-top: 2px solid var(--cizgi); max-width: 52rem; }
+  h2 { font-size: 2.25rem; margin-bottom: 0.4rem; }
+  a { text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .tarih { color: var(--soluk); margin-top: 0.4rem; }
+</style>

@@ -1,0 +1,65 @@
+---
+import '../stil/temel.css';
+import { acikBolumler, site } from '../site';
+
+interface Props { baslik?: string; aciklama?: string; gorsel?: string; tur?: 'website' | 'article'; dizinleme?: boolean }
+const { baslik, aciklama = site.aciklama, gorsel = '/paylasim.png', tur = 'website', dizinleme = true } = Astro.props;
+const tamBaslik = baslik ? `${baslik} | ${site.ad}` : site.ad;
+const asil = new URL(Astro.url.pathname, Astro.site).href;
+const gorselAdres = new URL(gorsel, Astro.site).href;
+const yol = Astro.url.pathname;
+---
+<!doctype html>
+<html lang={site.dil}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{tamBaslik}</title>
+    <meta name="description" content={aciklama} />
+    {dizinleme ? <link rel="canonical" href={asil} /> : <meta name="robots" content="noindex" />}
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="alternate" type="application/rss+xml" title={site.ad} href="/rss.xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#d9dfe1" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#20272c" />
+    <meta property="og:site_name" content={site.ad} />
+    <meta property="og:type" content={tur} />
+    <meta property="og:locale" content="tr_TR" />
+    <meta property="og:title" content={baslik ?? site.ad} />
+    <meta property="og:description" content={aciklama} />
+    <meta property="og:url" content={asil} />
+    <meta property="og:image" content={gorselAdres} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <slot name="bas" />
+  </head>
+  <body>
+    <a class="atla" href="#icerik">İçeriğe geç</a>
+    <header class="ust sar">
+      {yol !== '/' && <a class="ad" href="/">{site.ad}</a>}
+      <nav aria-label="Bölümler">
+        <ul role="list">
+          {acikBolumler.map((b) => (
+            <li><a href={`/${b.id}/`} aria-current={yol === `/${b.id}/` ? 'page' : yol.startsWith(`/${b.id}/`) ? 'true' : undefined}>{b.ad}</a></li>
+          ))}
+        </ul>
+      </nav>
+    </header>
+    <main id="icerik" tabindex="-1"><slot /></main>
+    <footer class="alt sar">
+      <p>{site.ad}</p>
+      <p><a href="/rss.xml">Yenilikleri RSS ile izle</a></p>
+    </footer>
+    <script src="../kutuphane/gecis.ts"></script>
+  </body>
+</html>
+<style>
+  .ust { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0.5rem 2rem; padding-block: 1.4rem; }
+  .ad { font: 800 1.75rem/1 var(--baslik); text-decoration: none; padding-block: 0.4rem; }
+  nav { margin-left: auto; }
+  nav ul { display: flex; flex-wrap: wrap; gap: 0.25rem 1.5rem; }
+  nav a { display: inline-block; padding-block: 0.6rem; font-weight: 600; text-decoration: none; }
+  nav a:hover, nav a[aria-current] { text-decoration: underline; text-decoration-thickness: 0.14em; }
+  #icerik:focus { outline: none; }
+  .alt { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem 2rem; margin-top: 6rem; padding-block: 1.75rem; color: var(--soluk); }
+  .alt a { display: inline-block; padding-block: 0.25rem; }
+</style>

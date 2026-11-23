@@ -1,0 +1,15 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Sayfa from '../duzen/Sayfa.astro';
+import { tumKayitlar } from '../kutuphane/kayit';
+/** Taşınmış adresler: içerikteki `eskiAdresler` alanından üretilir. */
+export const getStaticPaths = (async () => {
+  const kayitlar = await tumKayitlar();
+  return kayitlar.flatMap((k) => k.eskiAdresler.map((eski) => ({ params: { eski }, props: { yol: k.yol, baslik: k.baslik } })));
+}) satisfies GetStaticPaths;
+const { yol, baslik } = Astro.props;
+---
+<Sayfa baslik={baslik} dizinleme={false}>
+  <meta slot="bas" http-equiv="refresh" content={`0;url=${yol}`} />
+  <p class="sar"><a href={yol}>{baslik}</a> buraya taşındı.</p>
+</Sayfa>

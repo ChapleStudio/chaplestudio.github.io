@@ -1,0 +1,24 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Sayfa from '../../duzen/Sayfa.astro';
+import IsListe from '../../turler/is/Liste.astro';
+import YaziListe from '../../turler/yazi/Liste.astro';
+import { acikBolumler } from '../../site';
+import { bolumKayitlari, isMi, yaziMi } from '../../kutuphane/kayit';
+export const getStaticPaths = (() => acikBolumler.map((bolum) => ({ params: { bolum: bolum.id }, props: { bolum } }))) satisfies GetStaticPaths;
+const { bolum } = Astro.props;
+const kayitlar = await bolumKayitlari(bolum);
+---
+<Sayfa baslik={bolum.ad} aciklama={bolum.aciklama}>
+  <div class="sar">
+    <h1>{bolum.ad}</h1>
+    <p class="aciklama">{bolum.aciklama}</p>
+    {kayitlar.length === 0 && <p>Bu rafta henüz bir şey yok.</p>}
+    {bolum.tur === 'is' && kayitlar.length > 0 && <IsListe kayitlar={kayitlar.filter(isMi)} />}
+    {bolum.tur === 'yazi' && kayitlar.length > 0 && <YaziListe kayitlar={kayitlar.filter(yaziMi)} />}
+  </div>
+</Sayfa>
+<style>
+  h1 { font-size: clamp(3.5rem, 10vw, 7.5rem); line-height: 0.86; padding-top: 1rem; }
+  .aciklama { font-size: 1.1875rem; margin-block: 1rem 2.5rem; max-width: 40rem; }
+</style>
