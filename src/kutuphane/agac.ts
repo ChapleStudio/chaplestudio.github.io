@@ -26,8 +26,8 @@ export const OLCU = {
   satir: 44,
   kat: 120,
   aralik: 84,
-  /** Bir gövdeye en çok bu kadar kayıt asılır; fazlası yan gövdeye geçer. */
-  govde: 10,
+  /** Dal yana değil aşağı büyür: sayfa dikey kayar. */
+  govde: Infinity,
   /** Bu kadar kayda kadar tek sütun, fazlası iki sütun. */
   tekSutun: 3,
 } as const;

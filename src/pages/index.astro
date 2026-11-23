@@ -33,12 +33,10 @@ const gruplar = await gruplanmisDizin();
       <ul role="list" aria-label="Proje ağacı">{dallar.map((d) => <Dal dugum={d} yerler={yerler} />)}</ul>
     </div>
   </div>
-  <p class="ipucu" aria-hidden="true">Sürükle, tekerlekle yaklaş, bir dala ya da projeye tıkla</p>
+  <p class="ipucu" aria-hidden="true">Bir dala ya da projeye tıkla</p>
   <div class="araclar">
     <div class="kapsul" role="group" aria-label="Görünüm">
       <button type="button" data-etiket-ac aria-expanded="false" aria-controls="etiket-paneli"><Ikon ad="etiket" /><span>Etiketler</span></button>
-      <button type="button" data-yakin="1.35"><Ikon ad="arti" /><span class="gizli">Yaklaş</span></button>
-      <button type="button" data-yakin="0.74"><Ikon ad="eksi" /><span class="gizli">Uzaklaş</span></button>
       {acikBolumler.map((b) => <a href={`/${b.id}/`}><Ikon ad="ara" /><span>{acikBolumler.length > 1 ? b.ad : 'Liste'}</span></a>)}
     </div>
   </div>

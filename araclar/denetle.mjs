@@ -86,6 +86,12 @@ async function sayfayiDenetle(s) {
         const sonuc = await sayfa.evaluate(() => axe.run({ runOnly: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'] }));
         for (const v of sonuc.violations) sorun(yer, `erişilebilirlik ${v.id} (${v.nodes.length}): ${v.nodes[0].target} ${v.nodes[0].any[0]?.message ?? ''}`);
       }
+      if (en === 390 && s === '/') {
+        await sayfa.$$eval('.tuval li[data-kapali-dal]', (l) => l.forEach((x) => x.removeAttribute('data-kapali-dal')));
+        const sonuc = await sayfa.evaluate(() => axe.run({ runOnly: ['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'] }));
+        for (const v of sonuc.violations) sorun(`${yer} açık dallar`, `erişilebilirlik ${v.id}: ${v.nodes[0].target} ${v.nodes[0].any[0]?.message ?? ''}`);
+        if ((await sayfa.evaluate(() => document.documentElement.scrollWidth - innerWidth)) > 0) sorun(`${yer} açık dallar`, 'yatay taşma');
+      }
       deneme++;
     }
   }
@@ -148,6 +154,41 @@ for (const [ad, gorunum] of [['masaüstü', { width: 1440, height: 900 }], ['tel
   await t.$eval('[data-oda-kabi] [data-cik]', (a) => a.click());
   await bekleKi('"Ağaca dön" çalışmadı', () => location.pathname === '/' && document.querySelector('[data-oda-kabi]').hidden);
   await bekle(1500);
+  if (ad === 'masaüstü') {
+    // elle yakınlaştırma yok: tekerlek ölçeği değiştirmez, taşan dalda dikey kaydırır
+    await t.setViewport({ width: 1262, height: 560 });
+    await bekle(300);
+    await t.$eval('.ust-kapsul [data-dugum-git="isler-oyun"]', (x) => x.click());
+    await bekle(2200);
+    const donus = () => t.evaluate(() => { const m = new DOMMatrix(getComputedStyle(document.querySelector('.dunya')).transform); return [m.a, m.f]; });
+    const [z1, y1] = await donus();
+    await t.mouse.move(600, 320);
+    await t.mouse.wheel({ deltaY: 300 });
+    await bekle(900);
+    const [z2, y2] = await donus();
+    if (Math.abs(z1 - z2) > 1e-6) sorun(y, 'tekerlek yakınlaştırdı');
+    if (!(y2 < y1 - 50)) sorun(y, `tekerlek aşağı kaydırmadı (${y1} → ${y2})`);
+    await t.mouse.wheel({ deltaY: 99999 });
+    await bekle(1500);
+    const alt = await t.evaluate(() => Math.max(...[...document.querySelectorAll('[id="isler-oyun"] .kart')].map((k) => k.getBoundingClientRect().bottom)) - innerHeight);
+    if (alt > 0 || alt < -400) sorun(y, `kaydırma sonu yanlış (${alt})`);
+    await t.setViewport(gorunum);
+    await bekle(300);
+    await t.$eval('.ust-kapsul [data-dugum-git="kok"]', (x) => x.click());
+    await bekle(1800);
+  } else {
+    const gorunenKart = () => t.$$eval('.tuval .kart', (k) => k.filter((x) => x.checkVisibility()).length);
+    await t.$eval('.ust-kapsul [data-dugum-git="kok"]', (x) => x.click());
+    await bekle(500);
+    if ((await gorunenKart()) !== 0) sorun(y, 'başta dallar kapalı değil');
+    await t.$eval('.tuval [data-dugum="isler-yapay-zeka"]', (x) => x.click());
+    await bekle(800);
+    const beklenen = await t.$$eval('[id="isler-yapay-zeka"] .kart', (k) => k.length);
+    if ((await gorunenKart()) !== beklenen) sorun(y, 'dokunulan dal tek başına açılmadı');
+    await t.$eval('.tuval [data-dugum="isler-yapay-zeka"]', (x) => x.click());
+    await bekle(600);
+    if ((await gorunenKart()) !== 0) sorun(y, 'ikinci dokunuş dalı kapatmadı');
+  }
   // etiketle süzme
   await t.$eval('[data-etiket-ac]', (b) => b.click());
   const [e1, adet] = await t.$eval('.etiket-paneli [data-etiket-sec]', (b) => [b.dataset.etiketSec, Number(b.querySelector('.adet').textContent)]);
@@ -156,7 +197,7 @@ for (const [ad, gorunum] of [['masaüstü', { width: 1440, height: 900 }], ['tel
   const eslesen = await t.$$eval('[data-eslesen]', (x) => x.length);
   if (eslesen !== adet) sorun(y, `etiket sayısı tutmuyor: ${e1} ${adet} yerine ${eslesen}`);
   if (!(await t.evaluate((e) => location.search === `?etiket=${e}`, e1))) sorun(y, 'etiket adrese yazılmadı');
-  if (ad === 'telefon' && (await t.$$eval('.tuval li[data-tur="kayit"]', (l) => l.filter((x) => x.offsetParent).length)) !== adet) sorun(y, 'telefonda eşleşmeyenler gizlenmedi');
+  if (ad === 'telefon' && (await t.$$eval('.tuval li[data-tur="kayit"]', (l) => l.filter((x) => x.checkVisibility()).length)) !== adet) sorun(y, 'telefonda eşleşmeyenler gizlenmedi');
   await t.$eval('[data-etiket-kapat]', (b) => b.click());
   if (await t.$eval('[data-suzgec-durumu]', (d) => d.hidden)) sorun(y, 'panel kapanınca seçili etiket görünmüyor');
   const kartYolu = await t.$eval('[data-eslesen]', (a) => { a.click(); return a.pathname; });

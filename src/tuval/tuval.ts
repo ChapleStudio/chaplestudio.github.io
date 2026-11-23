@@ -10,7 +10,7 @@ const $ = <T extends Element>(s: string, k: ParentNode = document) => k.querySel
 const tuval = $<HTMLElement>('[data-tuval]'), zemin = $<HTMLCanvasElement>('.zemin', tuval), dunya = $<HTMLElement>('.dunya', tuval);
 const kap = $<HTMLElement>('[data-oda-kabi]'), ipucu = $<HTMLElement>('.ipucu'), ustKapsul = $<HTMLElement>('.ust-kapsul');
 const { cizgiler: ham, ebeveyn, etiketleri } = JSON.parse($('#agac').textContent!) as AgacVerisi;
-const genisEkran = matchMedia('(min-width: 52rem) and (min-height: 30rem)');
+const genisEkran = matchMedia('(min-width: 68rem) and (min-height: 30rem)');
 const sakin = matchMedia('(prefers-reduced-motion: reduce)');
 const anaBaslik = document.title;
 
@@ -28,6 +28,7 @@ for (const [c, e] of Object.entries(ebeveyn)) if (dugumler.has(c)) cocuklar.set(
 const ust = (id: string): string | undefined => { const e = ebeveyn[id]; return e === undefined ? undefined : dugumler.has(e) ? e : 'kok'; };
 const soy = (id: string) => { const s: string[] = []; for (let n: string | undefined = id; n; n = ust(n)) s.push(n); return s; };
 const altlar = (id: string): string[] => [id, ...(cocuklar.get(id) ?? []).flatMap(altlar)];
+const derinlik = (id: string) => soy(id).length - 1;
 const yaprakMi = (id: string) => dugumler.get(id)?.hasAttribute('data-kart') ?? false;
 
 /* ---------- Durum ---------- */
@@ -38,7 +39,9 @@ let dal = 'kok', vurgulu: Set<string> = new Set(), odada: string | null = null, 
 let buyume = sakin.matches ? 9 : -1, buyumeBasi = 0;
 /** Bir dal seçilince ışık dalgası tepeden uçlara iner. */
 let dalga: { bas: number; ids: Set<string>; kat: number } | null = null;
-let fare = { x: -999, y: -999 }, hiz = { x: 0, y: 0 }, ucus: { iptal: () => void } | null = null;
+/** Geçerli görünümde dikey kaymanın sınırları ve yumuşak kaymanın hedefi. */
+let kayma = { en: 0, son: 0 }, hedefY: number | null = null;
+let fare = { x: -999, y: -999 }, ucus: { iptal: () => void } | null = null;
 
 const uygula = () => {
   dunya.style.transform = `translate3d(${W / 2 - kam.x * kam.z}px, ${H / 2 - kam.y * kam.z}px, 0) scale(${kam.z})`;
@@ -50,27 +53,23 @@ const kutuHesapla = (ids: string[]): Kutu => {
   for (const id of ids) { const k = yerler.get(id)!; a = Math.min(a, k.x); b = Math.min(b, k.y); c = Math.max(c, k.x + k.w); d = Math.max(d, k.y + k.h); }
   return { x: a, y: b, w: c - a, h: d - b };
 };
-const sigdir = (k: Kutu, enBuyuk = 1.15): Kamera => {
-  const tepe = 108, dip = 40, yan = 60;
-  const z = Math.min((W - yan * 2) / k.w, (H - tepe - dip) / k.h, enBuyuk);
-  return { x: k.x + k.w / 2, y: k.y + k.h / 2 - (tepe - dip) / 2 / z, z: Math.max(z, 0.06) };
-};
-/** Dal görünümü: sığmayacak kadar uzun dalda okunur bir yakınlıkta tepeden başlar. */
-const dalGorunumu = (id: string): Kamera => {
-  const k = kutuHesapla(altlar(id));
-  const g = sigdir(k, 0.95);
-  const okunur = id === 'kok' ? 0.3 : 0.62;
-  if (g.z >= okunur) return g;
-  const z = Math.min(okunur, (W - 120) / Math.min(k.w, 1900));
-  const tepe = yerler.get(id)!;
-  return { x: tepe.x + tepe.w / 2, y: k.y + (H / 2 - 100) / z, z };
-};
-const enAz = () => Math.min(sigdir(kutuHesapla([...yerler.keys()])).z * 0.7, 0.3);
+/** Görünüm: genişliğe sığar; boya sığmazsa tepeden başlar ve dikey kayar. */
+function gorunumKur(k: Kutu, sol: number, enBuyuk: number, okunur: number): Kamera {
+  const tepe = 108, dip = 60, en = W - sol - 60;
+  const zEn = Math.min(en / k.w, enBuyuk), zHepsi = Math.min(zEn, (H - tepe - dip) / k.h);
+  const z = zHepsi >= Math.min(okunur, zEn * 0.8) ? zHepsi : Math.min(zEn, Math.max(okunur, zHepsi));
+  const x = k.x + k.w / 2 - (sol - 60) / 2 / z, sigar = k.h * z <= H - tepe - dip + 1;
+  const y0 = sigar ? k.y + k.h / 2 - (tepe - dip) / 2 / z : k.y + (H / 2 - tepe) / z;
+  kayma = { en: y0, son: sigar ? y0 : Math.max(y0, k.y + k.h - (H / 2 - dip) / z) };
+  hedefY = null;
+  return { x, y: y0, z };
+}
+const dalGorunumu = (id: string): Kamera => gorunumKur(kutuHesapla(altlar(id)), 60, id === 'kok' ? 0.8 : 0.95, id === 'kok' ? 0.5 : 0.7);
 
 const ucusuDurdur = () => { ucus?.iptal(); ucus = null; };
 function uc(hedef: Kamera, sure?: number, her?: (p: number) => void): Promise<void> {
   ucus?.iptal();
-  hiz = { x: 0, y: 0 };
+  hedefY = null;
   const yol = ucusYolu(kam, hedef, W);
   const ms = sakin.matches ? 0 : (sure ?? Math.min(1500, Math.max(520, yol.uzunluk * 620)));
   return canliTut(new Promise<void>((bitti) => {
@@ -104,6 +103,15 @@ function karart() {
     const li = el.closest('li');
     if (li) li.hidden = !acik && secili.size > 0 && !parlak.has(n);
   }
+  // Telefon: yalnız seçili dal açık durur; süzerken eşleşen bütün dallar açılır.
+  const zincir = new Set([...soy(dal), ...(dal === 'kok' ? [] : altlar(dal))]);
+  for (const a of tuval.querySelectorAll<HTMLElement>('[data-dal][data-dugum]')) {
+    const n = a.dataset['dugum']!, derin = derinlik(n);
+    const ac = acik || (secili.size ? parlak.has(n) : zincir.has(n) || (derin > 1 && soy(n).some((u) => u !== 'kok' && u !== n && zincir.has(u))));
+    a.closest('li')!.toggleAttribute('data-kapali-dal', !ac);
+    if (acik) a.removeAttribute('aria-expanded');
+    else a.setAttribute('aria-expanded', String(ac));
+  }
 }
 function isaretle(id: string) {
   dal = id;
@@ -112,10 +120,16 @@ function isaretle(id: string) {
   for (const a of ustKapsul.querySelectorAll<HTMLElement>('[data-dugum-git]')) {
     const g = a.dataset['dugumGit']!;
     const secili = g === 'kok' ? id === 'kok' : zincir.has(g);
-    if (secili) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
+    if (secili) {
+      a.setAttribute('aria-current', 'true');
+      const k = a.parentElement!;
+      k.scrollTo({ left: a.offsetLeft - (k.clientWidth - a.offsetWidth) / 2, behavior: 'smooth' });
+    } else a.removeAttribute('aria-current');
   }
 }
 function dalaGit(id: string, gecmis: boolean) {
+  // Telefonda açık dala bir daha dokunmak onu kapatır.
+  if (!acik && gecmis && id === dal && id !== 'kok') id = ust(id) ?? 'kok';
   etiketSec([], false);
   if (gecmis && (location.search || (location.hash.slice(1) || 'kok') !== id)) history.pushState({ dal: id }, '', id === 'kok' ? '/' : `/#${id}`);
   isaretle(id);
@@ -179,10 +193,7 @@ function etiketSec(yeni: Iterable<string>, git = true) {
 }
 /** Eşleşenleri panelin sağında kalan alana sığdırır. */
 function etiketGorunumu(uyan: string[]): Kamera {
-  const k = kutuHesapla([...new Set(uyan.flatMap(soy))].filter((n) => n !== 'kok'));
-  const sol = panel.hidden ? 60 : panel.offsetWidth + 50, en = W - sol - 60;
-  const z = Math.max(0.12, Math.min(en / k.w, (H - 200) / k.h, 0.95));
-  return { x: k.x + k.w / 2 - (sol - 60) / 2 / z, y: k.y + k.h / 2 - 10 / z, z };
+  return gorunumKur(kutuHesapla([...new Set(uyan.flatMap(soy))].filter((n) => n !== 'kok')), panel.hidden ? 60 : panel.offsetWidth + 50, 0.9, 0.5);
 }
 const adrestekiEtiketler = () => (new URLSearchParams(location.search).get('etiket') ?? '').split(',').filter(Boolean);
 
@@ -330,7 +341,6 @@ const cizgiler: Cizgi[] = ham.map((c) => {
   const renk = renkCoz(c.renk);
   return { kutu: [kx0, ky0, kx1, ky1], cocuk: c.cocuk, nokta, boy, renk, sonuk: soldur(renk, 0.42), gecikme: yaprakMi(c.cocuk) ? 0.55 : 0 };
 });
-const derinlik = (id: string) => soy(id).length - 1;
 for (const c of cizgiler) c.gecikme = Math.max(0, derinlik(c.cocuk) - 1) * 0.6 + (yaprakMi(c.cocuk) ? Math.min(0.5, ((yerler.get(c.cocuk)!.y) / 2600) * 0.5) : 0);
 
 function vurgula(id: string | null) { vurgulu = new Set(id ? soy(id) : []); }
@@ -480,10 +490,10 @@ function kare(an: number) {
       for (const c of cizgiler) if (buyume > c.gecikme + 0.45) dugumler.get(c.cocuk)?.removeAttribute('data-kapali');
       if (buyume > 3.2) buyume = 9;
     }
-    if (!ucus && !tutulan && (Math.abs(hiz.x) > 0.05 || Math.abs(hiz.y) > 0.05)) {
-      kam = { ...kam, x: kam.x - hiz.x / kam.z, y: kam.y - hiz.y / kam.z };
-      hiz = { x: hiz.x * 0.92, y: hiz.y * 0.92 };
-      sinirla();
+    if (!ucus && hedefY !== null) {
+      const fark = hedefY - kam.y;
+      kam = { ...kam, y: Math.abs(fark) * kam.z < 0.4 ? hedefY : kam.y + fark * 0.2 };
+      if (kam.y === hedefY) hedefY = null;
       uygula();
     }
     zeminCiz(an);
@@ -491,60 +501,34 @@ function kare(an: number) {
 }
 
 /* ---------- Girdi ---------- */
-function sinirla() {
-  const k = kutuHesapla([...yerler.keys()]);
-  kam = { z: Math.min(2.4, Math.max(enAz(), kam.z)), x: Math.min(k.x + k.w, Math.max(k.x, kam.x)), y: Math.min(k.y + k.h, Math.max(k.y, kam.y)) };
+/** Dikey kaydırma. Yakınlaştırma yoktur; tarayıcının kendi yakınlaştırmasına (Ctrl) karışılmaz. */
+function kaydir(piksel: number, aninda = false) {
+  if (ucus || kayma.son <= kayma.en) return;
+  const y = Math.min(kayma.son, Math.max(kayma.en, (hedefY ?? kam.y) + piksel / kam.z));
+  ipucu.setAttribute('data-bitti', '');
+  if (aninda || sakin.matches) { kam = { ...kam, y }; hedefY = null; uygula(); }
+  else hedefY = y;
 }
-const yakinlas = (kat: number, px: number, py: number) => {
-  const z = Math.min(2.4, Math.max(enAz(), kam.z * kat)), wx = (px - W / 2) / kam.z + kam.x, wy = (py - H / 2) / kam.z + kam.y;
-  kam = { x: wx - (px - W / 2) / z, y: wy - (py - H / 2) / z, z };
-  sinirla();
-  uygula();
-  olcekVer(kam.z);
-};
-let tutulan: { x: number; y: number; kx: number; ky: number; yol: number; son: number } | null = null, surukledi = false;
-const parmaklar = new Map<number, { x: number; y: number }>();
-let kistirma = 0;
+let parmak: { y: number; toplam: number; hiz: number } | null = null, surukledi = false;
 tuval.addEventListener('pointerdown', (e) => {
-  if (!acik || e.button !== 0) return;
-  ucusuDurdur();
-  parmaklar.set(e.pointerId, { x: e.clientX, y: e.clientY });
-  tutulan = { x: e.clientX, y: e.clientY, kx: kam.x, ky: kam.y, yol: 0, son: performance.now() };
   surukledi = false;
-  hiz = { x: 0, y: 0 };
+  if (acik && e.pointerType !== 'mouse') parmak = { y: e.clientY, toplam: 0, hiz: 0 };
 });
 addEventListener('pointermove', (e) => {
-  if (!acik) return;
   fare = { x: e.clientX, y: e.clientY };
-  if (!tutulan) return;
-  if (parmaklar.has(e.pointerId)) parmaklar.set(e.pointerId, { x: e.clientX, y: e.clientY });
-  if (parmaklar.size === 2) {
-    const [a, b] = [...parmaklar.values()] as [{ x: number; y: number }, { x: number; y: number }];
-    const m = Math.hypot(a.x - b.x, a.y - b.y);
-    if (kistirma) yakinlas(m / kistirma, (a.x + b.x) / 2, (a.y + b.y) / 2);
-    kistirma = m;
-    surukledi = true;
-    return;
-  }
-  const dx = e.clientX - tutulan.x, dy = e.clientY - tutulan.y;
-  if (!surukledi && Math.hypot(dx, dy) > 5) { surukledi = true; tuval.setAttribute('data-tutuldu', ''); ipucu.setAttribute('data-bitti', ''); }
-  if (!surukledi) return;
-  const onceki = { x: kam.x, y: kam.y };
-  kam = { ...kam, x: tutulan.kx - dx / kam.z, y: tutulan.ky - dy / kam.z };
-  sinirla();
-  hiz = { x: (onceki.x - kam.x) * kam.z, y: (onceki.y - kam.y) * kam.z };
-  uygula();
+  if (!acik || !parmak) return;
+  const dy = parmak.y - e.clientY;
+  parmak = { y: e.clientY, toplam: parmak.toplam + Math.abs(dy), hiz: dy };
+  if (parmak.toplam > 6) { surukledi = true; kaydir(dy, true); }
 });
-const birak = (e: PointerEvent) => { parmaklar.delete(e.pointerId); kistirma = 0; if (!parmaklar.size) { tutulan = null; tuval.removeAttribute('data-tutuldu'); } else { const p = [...parmaklar.values()][0]!; tutulan = { x: p.x, y: p.y, kx: kam.x, ky: kam.y, yol: 0, son: 0 }; } };
+const birak = () => { if (parmak && surukledi) kaydir(parmak.hiz * 9); parmak = null; };
 addEventListener('pointerup', birak);
 addEventListener('pointercancel', birak);
 tuval.addEventListener('dragstart', (e) => e.preventDefault());
 tuval.addEventListener('wheel', (e) => {
-  if (!acik) return;
+  if (!acik || e.ctrlKey) return;
   e.preventDefault();
-  ucusuDurdur();
-  ipucu.setAttribute('data-bitti', '');
-  yakinlas(Math.exp(-Math.max(-240, Math.min(240, e.deltaY * (e.deltaMode ? 20 : 1))) * 0.0016), e.clientX, e.clientY);
+  kaydir(e.deltaY * (e.deltaMode === 1 ? 32 : e.deltaMode === 2 ? H : 1));
 }, { passive: false });
 
 tuval.addEventListener('pointerover', (e) => {
@@ -560,15 +544,15 @@ tuval.addEventListener('focusin', (e) => {
   tuval.scrollTo(0, 0);
   const id = d.dataset['dugum']!;
   vurgula(id);
+  if (d.hasAttribute('data-sonuk') && !secili.size) { isaretle(yaprakMi(id) ? (ust(id) ?? 'kok') : id); void uc(dalGorunumu(dal)); return; }
   const s = ekranda(yerler.get(id)!);
-  if (s.x < 40 || s.y < 90 || s.x + s.w > W - 40 || s.y + s.h > H - 40) { const k = yerler.get(id)!; void uc({ x: k.x + k.w / 2, y: k.y + k.h / 2, z: Math.max(kam.z, 0.6) }); }
+  if (s.y < 100) kaydir(s.y - 120);
+  else if (s.y + s.h > H - 60) kaydir(s.y + s.h - H + 80);
 });
 
 const sadeTik = (e: MouseEvent) => e.button === 0 && !e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey;
 document.addEventListener('click', (e) => {
   if (!(e.target instanceof Element)) return;
-  const yakin = e.target.closest<HTMLElement>('[data-yakin]');
-  if (yakin) { void uc({ ...kam, z: Math.min(2.4, Math.max(enAz(), kam.z * Number(yakin.dataset['yakin']))) }, 320); return; }
   if (e.target.closest('[data-etiket-ac]')) { panelGoster(Boolean(panel.hidden)); if (!panel.hidden) panel.querySelector<HTMLElement>('[data-etiket-sec]')?.focus(); return; }
   if (e.target.closest('[data-etiket-kapat]')) { panelGoster(false); panelAc.focus(); return; }
   if (e.target.closest('[data-etiket-temizle]')) { etiketSec([]); panel.querySelector<HTMLElement>('[data-etiket-sec]')?.focus(); return; }
@@ -602,6 +586,8 @@ addEventListener('keydown', (e) => {
     return;
   }
   if (!acik || odada) return;
+  const sayfa = { PageDown: H * 0.8, PageUp: -H * 0.8, Home: -1e6, End: 1e6 }[e.key];
+  if (sayfa) { e.preventDefault(); kaydir(sayfa); return; }
   const id = document.activeElement instanceof HTMLElement ? document.activeElement.closest<HTMLElement>('[data-dugum]')?.dataset['dugum'] : undefined;
   if (!e.key.startsWith('Arrow')) return;
   e.preventDefault();
@@ -633,6 +619,7 @@ function kur() {
   const once = acik;
   acik = genisEkran.matches;
   tuval.toggleAttribute('data-acik', acik);
+  tuval.setAttribute('data-hazir', '');
   document.documentElement.toggleAttribute('data-tuval-acik', acik);
   W = tuval.clientWidth; H = tuval.clientHeight;
   for (const [id, el] of dugumler) {

@@ -2,7 +2,7 @@
 
 ## Fikir
 
-Site yukarıdan aşağı dallanan bir **düğüm ağacı**: Chaple Studio → (bölüm) → kategori → (alt dal) → proje. Kategori amaçtır; platform, dil ve araç etikettir. Rowl Engine'in hikâye tuvalinden gelir. Dala tıklayınca kamera ona uçar, projeye tıklayınca düğüm ekranı kaplar ve içine girilir. İçerik büyüdükçe ağaç büyür; yerleşim `src/kutuphane/agac.ts` içinde hesaplanır, elle konum verilmez.
+Site yukarıdan aşağı dallanan bir **düğüm ağacı**: Chaple Studio → (bölüm) → kategori → (alt dal) → proje. Kategori amaçtır; platform, dil ve araç etikettir. Rowl Engine'in hikâye tuvalinden gelir. Elle yakınlaştırma ve sürükleme yoktur; tekerlek sayfayı dikey kaydırır. Dala tıklayınca kamera ona uçar, projeye tıklayınca düğüm ekranı kaplar ve içine girilir. İçerik büyüdükçe ağaç büyür; yerleşim `src/kutuphane/agac.ts` içinde hesaplanır, elle konum verilmez.
 
 ## Renk
 
@@ -41,4 +41,4 @@ Proje düğümünde ekran görüntüsü yerine ne yaptığını anlatan küçük
 
 ## Erişim
 
-Ağaç gerçek bir bağlantı listesidir. JavaScript yoksa ve telefonda yukarıdan aşağı akar. Ok tuşları düğümler arasında gezer, Esc bir kat çıkar, her projenin kendi adresi vardır.
+Ağaç gerçek bir bağlantı listesidir. Telefonda kök ve kategoriler tek ekrandadır, dokunulan dal açılır. JavaScript yoksa bütün dallar açık akar. Ok tuşları düğümler arasında gezer, Esc bir kat çıkar, her projenin kendi adresi vardır.
