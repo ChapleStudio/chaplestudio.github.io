@@ -1,22 +1,16 @@
 ---
 import { render } from 'astro:content';
+import OdaGiris from '../../bilesenler/OdaGiris.astro';
 import { isoGun, tarihYaz, type YaziKaydi } from '../../kutuphane/kayit';
 interface Props { kayit: YaziKaydi }
 const { kayit } = Astro.props;
-const v = kayit.veri;
 const { Content } = await render(kayit.girdi);
 ---
-<article class="sar">
-  <header data-renk={kayit.renk}>
-    <h1>{v.baslik}</h1>
-    <p>{v.ozet}</p>
-    <p><time datetime={isoGun(v.tarih)}>{tarihYaz(v.tarih)}</time>{v.guncelleme && <span>{`, güncellendi: ${tarihYaz(v.guncelleme)}`}</span>}</p>
-  </header>
+<OdaGiris kayit={kayit} />
+<div class="sar oda-govde" data-renk={kayit.dal.renk}>
+  <dl class="kunye">
+    <div><dt>Tarih</dt><dd><time datetime={isoGun(kayit.veri.tarih)}>{tarihYaz(kayit.veri.tarih)}</time></dd></div>
+    {kayit.veri.guncelleme && <div><dt>Güncelleme</dt><dd><time datetime={isoGun(kayit.veri.guncelleme)}>{tarihYaz(kayit.veri.guncelleme)}</time></dd></div>}
+  </dl>
   <div class="yazi"><Content /></div>
-</article>
-<style>
-  header { background: var(--kutu); color: var(--kutu-yazi); padding: clamp(1.5rem, 5vw, 3.5rem); view-transition-name: kutu; border-radius: 2px; }
-  h1 { font-size: clamp(3rem, 8vw, 6rem); max-width: 18ch; }
-  header p { margin-top: 1rem; max-width: 40rem; }
-  .yazi { max-width: var(--olcu); padding-top: 2.5rem; font-size: 1.1875rem; }
-</style>
+</div>

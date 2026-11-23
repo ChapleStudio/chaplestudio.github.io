@@ -1,12 +1,12 @@
 ---
 baslik: R9T Studio
 ozet: GameGaraj Slayer R9T dizüstü için Linux kontrol merkezi. Fan, güç, RGB klavye ve tanılama tek yerde.
+sahne: klavye
 cesit: masaustu
 kapsam: 3
 baslangic: 2026-10-03
 guncelleme: 2026-11-21
 suruyor: true
-masada: 2
 teknoloji: [Rust, Tauri, Svelte]
 platform: [Linux]
 baglantilar:

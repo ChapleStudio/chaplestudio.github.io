@@ -1,6 +1,7 @@
 ---
 baslik: Network Monitor
 ozet: Anlık indirme ve yükleme hızını küçük, hep üstte duran bir pencerede gösteren araç.
+sahne: ag
 cesit: masaustu
 kapsam: 1
 baslangic: 2026-02-05

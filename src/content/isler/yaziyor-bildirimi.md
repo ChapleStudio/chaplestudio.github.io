@@ -1,6 +1,7 @@
 ---
 baslik: Yazıyor Bildirimi
 ozet: WhatsApp Web'de biri yazmaya başlayınca masaüstü bildirimi gönderen tarayıcı eklentisi.
+sahne: yaziyor
 cesit: mobil
 kapsam: 1
 baslangic: 2026-04-12

@@ -1,7 +1,7 @@
 ---
 baslik: Unity Online Altyapısı
-sirtAdi: Unity Online
 ozet: Unity 6 oyunlarına çevrimiçi eşleşme, yerel ağ ve bölünmüş ekran ekleyen hazır paket.
+sahne: eslesme
 cesit: motor
 kapsam: 2
 baslangic: 2026-03-15

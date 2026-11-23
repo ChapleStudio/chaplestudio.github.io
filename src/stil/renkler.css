@@ -1,21 +1,19 @@
 :root {
-  color-scheme: light dark;
-  --duvar: light-dark(#d9dfe1, #20272c);
-  --yuzey: light-dark(#eef1f2, #2a3238);
-  --murekkep: light-dark(#15191d, #eef1f2);
-  --soluk: light-dark(#465058, #b3bdc3);
-  --cizgi: light-dark(#aab4b9, #4a555c);
-  --tahta: light-dark(#15191d, #0f1316);
-  --zinober: light-dark(#c0301d, #c93a27);
-  --lacivert: light-dark(#22399b, #3f58c8);
-  --cam: light-dark(#1d5b45, #2a7759);
-  --hardal: #e6a417;
-  --kagit: #f7f8f6;
-  --beyaz: #ffffff;
-  --siyah: #15191d;
+  color-scheme: dark;
+  --zemin: #0b0b0b;
+  --yuzey: #151413;
+  --yuzey-2: #1f1d1b;
+  --cizgi: #3a3631;
+  --kemik: #e9e3d8;
+  --soluk: #aaa399;
+  --mercan: #e76f8b;
+  --altin: #e0b06c;
+  --adacayi: #86bfa6;
+  --leylak: #a9a7ee;
+  --dal: var(--kemik);
 }
-[data-renk='zinober'] { --kutu: var(--zinober); --kutu-yazi: var(--beyaz); }
-[data-renk='lacivert'] { --kutu: var(--lacivert); --kutu-yazi: var(--beyaz); }
-[data-renk='cam'] { --kutu: var(--cam); --kutu-yazi: var(--beyaz); }
-[data-renk='hardal'] { --kutu: var(--hardal); --kutu-yazi: var(--siyah); }
-[data-renk='kagit'] { --kutu: var(--kagit); --kutu-yazi: var(--siyah); }
+[data-renk='mercan'] { --dal: var(--mercan); }
+[data-renk='altin'] { --dal: var(--altin); }
+[data-renk='adacayi'] { --dal: var(--adacayi); }
+[data-renk='leylak'] { --dal: var(--leylak); }
+[data-renk='kemik'] { --dal: var(--kemik); }

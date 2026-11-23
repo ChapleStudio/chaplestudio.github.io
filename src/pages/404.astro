@@ -2,16 +2,16 @@
 import Sayfa from '../duzen/Sayfa.astro';
 import { acikBolumler } from '../site';
 ---
-<Sayfa baslik="Bu kutu rafta yok" dizinleme={false}>
+<Sayfa baslik="Bu dal kurumuş" dizinleme={false}>
   <div class="sar">
-    <h1>Bu kutu rafta yok</h1>
+    <h1>Bu dal kurumuş</h1>
     <p>Adres yanlış olabilir ya da iş taşınmış olabilir.</p>
-    <p><a class="dugme" href="/">Rafa dön</a></p>
+    <p><a class="dugme" href="/">Ağaca dön</a></p>
     <ul>{acikBolumler.map((b) => <li><a href={`/${b.id}/`}>{b.ad}</a></li>)}</ul>
   </div>
 </Sayfa>
 <style>
-  h1 { font-size: clamp(3.5rem, 10vw, 7.5rem); padding-top: 2rem; }
+  h1 { font-size: clamp(3rem, 9vw, 6.5rem); letter-spacing: -0.055em; padding-top: 4rem; }
   p { margin-top: 1.25rem; }
   ul { margin-top: 1.5rem; padding-left: 1.2em; }
 </style>

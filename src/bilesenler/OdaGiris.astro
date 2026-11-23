@@ -1,0 +1,20 @@
+---
+import Ikon from './Ikon.astro';
+import type { Kayit } from '../kutuphane/kayit';
+interface Props { kayit: Kayit }
+const { kayit } = Astro.props;
+---
+<header class="oda-giris" data-renk={kayit.dal.renk}>
+  <canvas class="oda-sahne" data-sahne={kayit.sahne ?? ''} data-kayit={kayit.id} aria-hidden="true"></canvas>
+  <div class="oda-ust">
+    <nav class="kapsul" aria-label="Yol">
+      <a href={`/#${kayit.bolum.id}/${kayit.id}`} data-cik><Ikon ad="agac" boy={18} />Ağaca dön</a>
+      <a href={`/#${kayit.bolum.id}-${kayit.dal.id}`} data-cik><Ikon ad={kayit.dal.ikon} boy={18} />{kayit.dal.ad}</a>
+    </nav>
+  </div>
+  <div class="oda-baslik sar">
+    <h1>{kayit.baslik}</h1>
+    <p>{kayit.ozet}</p>
+    <slot />
+  </div>
+</header>

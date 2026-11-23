@@ -1,9 +1,9 @@
-/** İş çeşitleri. Renk ve ikon buradan gelir; yeni çeşit eklemek için buraya ve stil/renkler.css'e bak. */
+/** İş çeşitleri ağacın dallarıdır. Sıra, dalların soldan sağa sırasıdır. Renkler stil/renkler.css içinde. */
 export const cesitler = {
-  oyun: { ad: 'Oyun', renk: 'zinober', ikon: 'oyun' },
-  motor: { ad: 'Motor ve altyapı', renk: 'lacivert', ikon: 'motor' },
-  masaustu: { ad: 'Masaüstü aracı', renk: 'cam', ikon: 'masaustu' },
-  mobil: { ad: 'Mobil ve tarayıcı', renk: 'hardal', ikon: 'mobil' },
+  oyun: { ad: 'Oyunlar', tekil: 'Oyun', renk: 'mercan', ikon: 'oyun' },
+  motor: { ad: 'Motorlar', tekil: 'Motor ve altyapı', renk: 'altin', ikon: 'motor' },
+  masaustu: { ad: 'Masaüstü', tekil: 'Masaüstü aracı', renk: 'adacayi', ikon: 'masaustu' },
+  mobil: { ad: 'Mobil ve tarayıcı', tekil: 'Mobil ve tarayıcı', renk: 'leylak', ikon: 'mobil' },
 } as const;
 
 export type Cesit = keyof typeof cesitler;

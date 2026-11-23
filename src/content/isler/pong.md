@@ -1,6 +1,7 @@
 ---
 baslik: Pong
 ozet: İki kişi aynı ekranda ya da üç zorluk seviyesinde bilgisayara karşı oynanan mobil Pong.
+sahne: pong
 cesit: oyun
 kapsam: 1
 baslangic: 2026-02-23

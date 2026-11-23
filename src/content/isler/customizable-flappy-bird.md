@@ -1,7 +1,7 @@
 ---
 baslik: Customizable Flappy Bird
-sirtAdi: Custom Flappy Bird
 ozet: Kuşu ve arka planı kendi resimlerinle değiştirebildiğin, çevrimiçi skor tablolu mobil oyun.
+sahne: boru
 cesit: oyun
 kapsam: 1
 baslangic: 2026-02-02

@@ -1,6 +1,7 @@
 ---
 baslik: Music Shredder
 ozet: Bir şarkıyı vokal, davul, bas ve diğer sesler olarak ayıran Windows masaüstü aracı.
+sahne: dalga
 cesit: masaustu
 kapsam: 2
 baslangic: 2026-02-13

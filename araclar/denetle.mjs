@@ -65,15 +65,22 @@ async function sayfayiDenetle(s) {
       await sayfa.evaluate(() => document.fonts.ready.then(() => undefined));
       const tasma = await sayfa.evaluate(() => document.documentElement.scrollWidth - innerWidth);
       if (tasma > 0) sorun(yer, `yatay taşma ${tasma}px`);
-      const tasanKutular = await sayfa.$$eval('.kutu', (kutular) =>
-        kutular.filter((k) => {
+      const tasan = await sayfa.$$eval('.kart, .dal, .kok', (dugumler) =>
+        dugumler.filter((k) => {
           const d = k.getBoundingClientRect();
-          return [...k.querySelectorAll('.sirt, .isaret, .yil')].some((c) => {
+          return [...k.querySelectorAll('strong, .alt, .sayi, span:not(.gizli):not(.gorsel), h1, p')].some((c) => {
             const r = c.getBoundingClientRect();
-            return r.top < d.top - 1 || r.bottom > d.bottom + 1 || r.left < d.left - 1 || r.right > d.right + 1 || c.scrollHeight > c.clientHeight + 4 && getComputedStyle(c).writingMode !== 'horizontal-tb';
+            return r.width > 0 && (r.top < d.top - 1 || r.bottom > d.bottom + 1 || r.left < d.left - 1 || r.right > d.right + 1 || c.scrollWidth > c.clientWidth + 2 && getComputedStyle(c).display === 'block');
           });
-        }).map((k) => k.dataset.baslik));
-      if (tasanKutular.length) sorun(yer, `kutudan taşan yazı: ${tasanKutular.slice(0, 4).join(', ')}`);
+        }).map((k) => k.textContent.trim().slice(0, 30)));
+      if (tasan.length) sorun(yer, `düğümden taşan yazı: ${tasan.slice(0, 4).join(', ')}`);
+      const cakisan = await sayfa.evaluate(() => {
+        if (!document.querySelector('[data-tuval][data-acik]')) return [];
+        const k = [...document.querySelectorAll('.dunya .dugum')].map((e) => [e.dataset.dugum, e.getBoundingClientRect()]), c = [];
+        for (let i = 0; i < k.length; i++) for (let j = i + 1; j < k.length; j++) { const a = k[i][1], b = k[j][1]; if (a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom) c.push(`${k[i][0]} × ${k[j][0]}`); }
+        return c;
+      });
+      if (cakisan.length) sorun(yer, `çakışan düğümler: ${cakisan.slice(0, 3).join(', ')}`);
       if (axeGenislikleri.has(en)) {
         await sayfa.evaluate(axe); // CDP ile çalışır, CSP'ye takılmaz
         const sonuc = await sayfa.evaluate(() => axe.run({ runOnly: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'] }));
@@ -108,7 +115,51 @@ await p.type('input[name=ara]', 'zzzz');
 if ((await gorunen()) !== 0 || !(await p.$eval('[data-bos]', (e) => !e.hidden))) sorun('/isler/', 'boş sonuç mesajı yok');
 await p.click('[data-temizle]');
 if ((await gorunen()) !== hepsi) sorun('/isler/', 'temizle çalışmıyor');
+// 4) Tuval: hareket açıkken dala yakınlaşma, düğüme girme, çıkma, geçmiş, klavye
 await tarayici.close();
+const hareketli = await puppeteer.launch({ executablePath: yol, args: ['--no-sandbox'] });
+const bekle = (ms) => new Promise((r) => setTimeout(r, ms));
+for (const [ad, gorunum] of [['masaüstü', { width: 1440, height: 900 }], ['telefon', { width: 390, height: 844, isMobile: true, hasTouch: true }]]) {
+  const y = `tuval ${ad}`, t = await hareketli.newPage();
+  t.on('pageerror', (e) => sorun(y, `betik: ${e.message}`));
+  t.on('console', (m) => m.type() === 'error' && sorun(y, `konsol: ${m.text()}`));
+  await t.setViewport(gorunum);
+  await t.goto(`${taban}/`, { waitUntil: 'load' });
+  await bekle(3600);
+  const bekleKi = (ne, f, ...arg) => t.waitForFunction(f, { timeout: 8000 }, ...arg).catch(() => sorun(y, ne));
+  const olcek = () => t.evaluate(() => Number(/scale\(([\d.]+)/.exec(document.querySelector('.dunya').style.transform)?.[1] ?? 0));
+  const z0 = await olcek();
+  const dal = await t.$$eval('.ust-kapsul [data-dugum-git]', (a) => a[1].dataset.dugumGit);
+  await t.$eval(`.ust-kapsul [data-dugum-git="${dal}"]`, (a) => a.click());
+  await bekle(2000);
+  if (!(await t.evaluate((d) => location.hash === `#${d}`, dal))) sorun(y, 'dal adrese yazılmadı');
+  if (ad === 'masaüstü' && !((await olcek()) > z0 * 1.05)) sorun(y, `dala yakınlaşmadı (${z0} → ${await olcek()})`);
+  const yolu = await t.$eval(`[id="${dal}"] [data-kart]`, (a) => { a.click(); return a.pathname; });
+  await bekleKi('düğüme girilmedi', (p) => location.pathname === p && !document.querySelector('[data-oda-kabi]').hidden && document.activeElement?.tagName === 'H1', yolu);
+  await bekle(400);
+  if (await t.$('.gecit')) sorun(y, 'geçit kalıntısı');
+  await t.keyboard.press('Escape');
+  await bekleKi('Esc ile çıkılmadı', () => location.pathname === '/' && document.querySelector('[data-oda-kabi]').hidden);
+  await bekle(1600);
+  if ((await t.evaluate(() => document.activeElement?.pathname)) !== yolu) sorun(y, 'çıkınca odak düğüme dönmedi');
+  await t.goBack();
+  await bekleKi('geri tuşu odaya dönmedi', (p) => location.pathname === p && !document.querySelector('[data-oda-kabi]').hidden, yolu);
+  await bekle(1500);
+  await t.$eval('[data-oda-kabi] [data-cik]', (a) => a.click());
+  await bekleKi('"Ağaca dön" çalışmadı', () => location.pathname === '/' && document.querySelector('[data-oda-kabi]').hidden);
+  await bekle(1500);
+  if (ad === 'masaüstü') {
+    const kare = await t.evaluate(() => new Promise((b) => { const s = []; let o = performance.now(); const k = (a) => { s.push(a - o); o = a; s.length < 90 ? requestAnimationFrame(k) : b(s.slice(5).sort((x, z) => x - z)[Math.floor(s.length * 0.9)]); }; requestAnimationFrame(k); }));
+    console.log(`Tuval kare süresi (yüzde 90): ${kare.toFixed(1)} ms`);
+    const d = await t.$$eval('[data-dal]', (a) => a.length);
+    if (!d) sorun(y, 'dal yok');
+    await t.goto(`${taban}${yolu.replace(/^/, '/#').replace('/#/', '/#').replace(/\/$/, '')}`, { waitUntil: 'load' });
+    await bekle(1800);
+    if (!(await t.evaluate(() => document.querySelector('.ust-kapsul [aria-current]')?.dataset.dugumGit !== 'kok'))) sorun(y, 'düğüm adresinden açılınca dalı seçilmedi');
+  }
+  await t.close();
+}
+await hareketli.close();
 sunucu.close();
 
 console.log(`${sayfalar.length} sayfa, ${deneme} görünüm denendi.`);

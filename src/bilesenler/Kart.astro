@@ -1,0 +1,10 @@
+---
+import type { Kayit } from '../kutuphane/kayit';
+interface Props { kayit: Kayit; yer?: string; dugum?: string }
+const { kayit, yer, dugum } = Astro.props;
+---
+<a href={kayit.yol} class:list={['kart', dugum && 'dugum']} data-renk={kayit.dal.renk} data-kart data-dugum={dugum} data-yer={yer} data-genis={kayit.genis ? '' : undefined}>
+  <span class="gorsel"><canvas data-sahne={kayit.sahne ?? ''} data-kayit={kayit.id} aria-hidden="true"></canvas></span>
+  <span class="ad"><strong>{kayit.baslik}</strong><span class="alt">{kayit.genis ? kayit.ozet : kayit.kunye}</span></span>
+  {kayit.suruyor && <span class="suruyor" title="Üzerinde çalışıyorum"><span class="gizli">Üzerinde çalışıyorum</span></span>}
+</a>

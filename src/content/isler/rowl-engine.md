@@ -1,12 +1,12 @@
 ---
 baslik: Rowl Engine
 ozet: Kod bilmeden görsel roman yapmak için oyun motoru ve düğüm tabanlı hikâye editörü.
+sahne: hikaye
 cesit: motor
 kapsam: 4
 baslangic: 2026-07-29
 guncelleme: 2026-11-11
 suruyor: true
-masada: 1
 teknoloji: [C++, C#, SDL3, Avalonia, Lua]
 platform: [Linux, Windows, Android (deneysel)]
 lisans: MIT

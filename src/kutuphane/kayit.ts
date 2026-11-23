@@ -1,27 +1,38 @@
 import { getCollection, type CollectionEntry, type CollectionKey } from 'astro:content';
 import { acikBolumler, type Bolum } from '../site';
 import type { IsVerisi, TurKimligi, YaziVerisi } from '../turler/semalar';
-import { cesitler } from '../turler/is/cesitler';
+import { cesitler, cesitKimlikleri } from '../turler/is/cesitler';
 
 export type Girdi = CollectionEntry<CollectionKey>;
-export type Renk = (typeof cesitler)[keyof typeof cesitler]['renk'] | 'kagit';
+export type Renk = (typeof cesitler)[keyof typeof cesitler]['renk'] | 'kemik';
 
 interface VeriTipleri {
   is: IsVerisi;
   yazi: YaziVerisi;
 }
 
-interface RafBilgisi {
-  sirtAdi: string;
-  /** Sıralama tarihi: en yeni başta. */
-  tarih: Date;
+/** Bir kaydın asılı olduğu dal. `sira` dalların soldan sağa yerini belirler. */
+export interface Dal {
+  id: string;
+  ad: string;
   renk: Renk;
   ikon: string;
-  turAdi: string;
-  kapsam: 1 | 2 | 3 | 4;
+  sira: number;
 }
 
-interface OrtakKayit extends RafBilgisi {
+interface DugumBilgisi {
+  dal: Dal;
+  /** Sıralama tarihi: en yeni üstte. */
+  tarih: Date;
+  turAdi: string;
+  /** Düğümün alt satırı. */
+  kunye: string;
+  genis: boolean;
+  suruyor: boolean;
+  sahne: string | undefined;
+}
+
+interface OrtakKayit extends DugumBilgisi {
   bolum: Bolum;
   id: string;
   yol: string;
@@ -31,7 +42,7 @@ interface OrtakKayit extends RafBilgisi {
   girdi: Girdi;
 }
 
-/** Raf, liste, akış ve site haritasının bildiği tek biçim. `tur` alanı `veri`nin tipini belirler. */
+/** Ağaç, liste, akış ve site haritasının bildiği tek biçim. `tur` alanı `veri`nin tipini belirler. */
 export type Kayit = { [T in TurKimligi]: OrtakKayit & { tur: T; veri: VeriTipleri[T] } }[TurKimligi];
 export type IsKaydi = Extract<Kayit, { tur: 'is' }>;
 export type YaziKaydi = Extract<Kayit, { tur: 'yazi' }>;
@@ -39,20 +50,37 @@ export type YaziKaydi = Extract<Kayit, { tur: 'yazi' }>;
 export const isMi = (k: Kayit): k is IsKaydi => k.tur === 'is';
 export const yaziMi = (k: Kayit): k is YaziKaydi => k.tur === 'yazi';
 
-/** Her içerik türü kendini rafa nasıl koyacağını burada söyler. */
-const rafBilgisi: { [T in TurKimligi]: (v: VeriTipleri[T]) => RafBilgisi } = {
+const gunAyYil = new Intl.DateTimeFormat('tr', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+const ayYil = new Intl.DateTimeFormat('tr', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+export const ayYilYaz = (t: Date) => ayYil.format(t);
+export const tarihYaz = (t: Date) => gunAyYil.format(t);
+export const isoGun = (t: Date) => t.toISOString().slice(0, 10);
+
+/** Her içerik türü kendini ağaca nasıl asacağını burada söyler. */
+const dugumBilgisi: { [T in TurKimligi]: (v: VeriTipleri[T]) => DugumBilgisi } = {
   is: (v) => {
     const c = cesitler[v.cesit];
-    return { sirtAdi: v.sirtAdi ?? v.baslik, tarih: v.guncelleme, renk: c.renk, ikon: c.ikon, turAdi: c.ad, kapsam: v.kapsam as RafBilgisi['kapsam'] };
+    return {
+      dal: { id: v.cesit, ad: c.ad, renk: c.renk, ikon: c.ikon, sira: cesitKimlikleri.indexOf(v.cesit) },
+      tarih: v.guncelleme,
+      turAdi: c.tekil,
+      kunye: v.teknoloji.join(', '),
+      genis: v.kapsam === 4,
+      suruyor: v.suruyor,
+      sahne: v.sahne,
+    };
   },
-  yazi: (v) => ({ sirtAdi: v.sirtAdi ?? v.baslik, tarih: v.tarih, renk: 'kagit', ikon: 'yazi', turAdi: 'Yazı', kapsam: 1 }),
+  yazi: (v) => {
+    const yil = v.tarih.getUTCFullYear();
+    return { dal: { id: String(yil), ad: String(yil), renk: 'kemik', ikon: 'yazi', sira: -yil }, tarih: v.tarih, turAdi: 'Yazı', kunye: tarihYaz(v.tarih), genis: false, suruyor: false, sahne: v.sahne ?? 'defter' };
+  },
 };
 
 function kaydaCevir<T extends TurKimligi>(bolum: Bolum, tur: T, girdi: Girdi): OrtakKayit & { tur: T; veri: VeriTipleri[T] } {
   // Tek tip sınırı: içerik, content.config.ts içinde aynı türün şemasıyla doğrulanmış olarak gelir.
   const veri = girdi.data as VeriTipleri[T];
   const { baslik, ozet, eskiAdresler } = veri;
-  return { tur, veri, bolum, girdi, id: girdi.id, yol: `/${bolum.id}/${girdi.id}/`, baslik, ozet, eskiAdresler, ...rafBilgisi[tur](veri) };
+  return { tur, veri, bolum, girdi, id: girdi.id, yol: `/${bolum.id}/${girdi.id}/`, baslik, ozet, eskiAdresler, ...dugumBilgisi[tur](veri) };
 }
 
 const yenidenEskiye = (a: Kayit, b: Kayit) => b.tarih.getTime() - a.tarih.getTime() || a.baslik.localeCompare(b.baslik, 'tr');
@@ -68,20 +96,3 @@ export async function bolumKayitlari(bolum: Bolum): Promise<Kayit[]> {
 export async function tumKayitlar(): Promise<Kayit[]> {
   return (await Promise.all(acikBolumler.map(bolumKayitlari))).flat().sort(yenidenEskiye);
 }
-
-/** Kutu ölçüleri (rem). Raf.astro'daki stille aynı; `npm run denetle` taşmayı yakalar. */
-const kutuBoyu: Record<string, number> = { motor: 25, masaustu: 23, oyun: 20.5, yazi: 21.5, mobil: 18 };
-const kapsamBoyu = { 1: 1.8, 2: 2.6, 3: 3.7, 4: 4.9 } as const;
-const sirtAdimlari = [1.2, 1.5, 1.8, 2.2, 2.6, 3.1, 3.7, 4.3, 4.9] as const;
-/** İkon, yıl ve boşluklardan sonra ada kalan yer düşülür; harf eni yazı boyunun yaklaşık 0,36'sı. */
-export function sirtBoyu(k: Kayit): number {
-  const yer = (kutuBoyu[k.ikon] ?? 18) - 6;
-  const enBuyuk = Math.min(kapsamBoyu[k.kapsam], yer / (k.sirtAdi.length * 0.36));
-  return sirtAdimlari.findLast((a) => a <= enBuyuk) ?? sirtAdimlari[0];
-}
-
-const ayYil = new Intl.DateTimeFormat('tr', { month: 'long', year: 'numeric', timeZone: 'UTC' });
-const gunAyYil = new Intl.DateTimeFormat('tr', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
-export const ayYilYaz = (t: Date) => ayYil.format(t);
-export const tarihYaz = (t: Date) => gunAyYil.format(t);
-export const isoGun = (t: Date) => t.toISOString().slice(0, 10);

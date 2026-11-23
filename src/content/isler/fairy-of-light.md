@@ -1,6 +1,7 @@
 ---
 baslik: Fairy of Light
 ozet: Biri insanı, öteki uçan periyi oynayan iki kişinin kapıya birlikte ulaştığı çevrimiçi oyun denemesi.
+sahne: peri
 cesit: oyun
 kapsam: 1
 baslangic: 2026-03-10

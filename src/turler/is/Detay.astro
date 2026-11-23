@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import { render } from 'astro:content';
 import Ikon from '../../bilesenler/Ikon.astro';
+import OdaGiris from '../../bilesenler/OdaGiris.astro';
 import { ayYilYaz, isoGun, type IsKaydi } from '../../kutuphane/kayit';
 interface Props { kayit: IsKaydi }
 const { kayit } = Astro.props;
@@ -9,21 +10,16 @@ const v = kayit.veri;
 const { Content } = await render(kayit.girdi);
 const [kapak, ...digerleri] = v.gorseller;
 ---
-<header class="kapak" data-renk={kayit.renk}>
-  <div class="sar">
-    <span class="damga"><Ikon ad={kayit.ikon} boy={160} /></span>
-    <h1>{v.baslik}</h1>
-    <p class="ozet">{v.ozet}</p>
-    {v.baglantilar.length > 0 && (
-      <ul class="eylem" role="list">
-        {v.baglantilar.map((b) => (
-          <li><a class="dugme" href={b.adres} rel="noopener"><Ikon ad={b.tur} /><span>{b.ad}{b.not && <small>{` (${b.not})`}</small>}</span></a></li>
-        ))}
-      </ul>
-    )}
-  </div>
-</header>
-<div class="sar govde">
+<OdaGiris kayit={kayit}>
+  {v.baglantilar.length > 0 && (
+    <ul class="eylem" role="list">
+      {v.baglantilar.map((b, i) => (
+        <li><a class:list={['dugme', i === 0 && 'asil']} href={b.adres} rel="noopener"><Ikon ad={b.tur} /><span>{b.ad}{b.not && ` (${b.not})`}</span></a></li>
+      ))}
+    </ul>
+  )}
+</OdaGiris>
+<div class="sar oda-govde" data-renk={kayit.dal.renk}>
   <dl class="kunye">
     <div><dt>Çeşit</dt><dd>{kayit.turAdi}</dd></div>
     <div><dt>Platform</dt><dd>{v.platform.join(', ')}</dd></div>
@@ -33,10 +29,10 @@ const [kapak, ...digerleri] = v.gorseller;
     {v.lisans && <div><dt>Lisans</dt><dd>{v.lisans}</dd></div>}
     {v.suruyor && <div><dt>Durum</dt><dd>Üzerinde çalışıyorum</dd></div>}
   </dl>
-  <div class="metin">
+  <div>
     {kapak && (
       <figure>
-        <Image src={kapak.dosya} alt={kapak.alt} widths={[480, 800, 1200, 1600]} sizes="(min-width: 64rem) 60vw, 92vw" loading="eager" fetchpriority="high" />
+        <Image src={kapak.dosya} alt={kapak.alt} widths={[480, 800, 1200, 1600]} sizes="(min-width: 64rem) 58vw, 92vw" loading="lazy" />
         {kapak.altyazi && <figcaption>{kapak.altyazi}</figcaption>}
       </figure>
     )}
@@ -45,7 +41,7 @@ const [kapak, ...digerleri] = v.gorseller;
       <div class="galeri">
         {digerleri.map((g) => (
           <figure>
-            <Image src={g.dosya} alt={g.alt} widths={[480, 800, 1200]} sizes="(min-width: 64rem) 30vw, 92vw" />
+            <Image src={g.dosya} alt={g.alt} widths={[480, 800, 1200]} sizes="(min-width: 64rem) 29vw, 92vw" />
             {g.altyazi && <figcaption>{g.altyazi}</figcaption>}
           </figure>
         ))}
@@ -53,26 +49,3 @@ const [kapak, ...digerleri] = v.gorseller;
     )}
   </div>
 </div>
-<style>
-  .kapak { background: var(--kutu); color: var(--kutu-yazi); padding-block: clamp(2.5rem, 7vw, 5.5rem); view-transition-name: kutu; }
-  .kapak .sar { position: relative; }
-  .damga { display: none; }
-  @media (min-width: 64rem) { .damga { display: block; position: absolute; right: var(--kenar); top: 50%; translate: 0 -50%; } }
-  h1 { font-size: clamp(3.5rem, 11vw, 8.5rem); line-height: 0.86; overflow-wrap: anywhere; }
-  .ozet { max-width: 40rem; font-size: clamp(1.1875rem, 2vw, 1.4375rem); line-height: 1.4; margin-top: 1.5rem; }
-  .eylem { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem; }
-  .kapak .dugme:hover { background: var(--kutu-yazi); color: var(--kutu); border-color: var(--kutu-yazi); }
-  .kapak :focus-visible { outline-color: currentColor; }
-  .govde { display: grid; gap: 3rem; padding-top: 3rem; }
-  .kunye { display: grid; grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr)); gap: 1.25rem 1.5rem; align-content: start; }
-  dt { color: var(--soluk); }
-  dd { margin: 0; font-weight: 600; }
-  figure { margin: 0; }
-  figure img { width: 100%; border-radius: 2px; background: var(--yuzey); }
-  figcaption { color: var(--soluk); margin-top: 0.6rem; }
-  .yazi { max-width: var(--olcu); }
-  figure + .yazi { margin-top: 2.5rem; }
-  .galeri { display: grid; gap: 1.75rem; margin-top: 3rem; }
-  @media (min-width: 48rem) { .galeri { grid-template-columns: 1fr 1fr; } .galeri figure:last-child:nth-child(odd) { grid-column: 1 / -1; } }
-  @media (min-width: 64rem) { .govde { grid-template-columns: 15rem minmax(0, 1fr); gap: 4rem; } .kunye { grid-template-columns: 1fr; position: sticky; top: 2rem; align-self: start; } }
-</style>

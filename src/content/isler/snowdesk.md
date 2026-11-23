@@ -1,12 +1,12 @@
 ---
 baslik: Snowdesk
 ozet: Windows masaüstüne kar yağdıran, pencerelerin üstünde kar biriktiren küçük bir kış uygulaması.
+sahne: kar
 cesit: masaustu
 kapsam: 2
 baslangic: 2026-11-22
 guncelleme: 2026-11-22
 suruyor: true
-masada: 4
 teknoloji: [Rust]
 platform: [Windows]
 lisans: MIT

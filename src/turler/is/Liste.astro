@@ -20,7 +20,7 @@ const durum = (v: (typeof satirlar)[number]['v']) =>
 <ul class="liste" role="list" data-liste>
   {satirlar.map(({ k, v }) => (
     <li data-cesit={v.cesit} data-teknoloji={JSON.stringify(v.teknoloji)} data-metin={[k.baslik, k.ozet, k.turAdi, ...v.teknoloji, ...v.platform].join(' ')}>
-      <span class="renk" data-renk={k.renk}><Ikon ad={k.ikon} boy={22} /></span>
+      <span class="renk" data-renk={k.dal.renk}><Ikon ad={k.dal.ikon} boy={22} /></span>
       <div class="ana">
         <h2><a href={k.yol}>{k.baslik}</a></h2>
         <p>{k.ozet}</p>
@@ -94,27 +94,26 @@ const durum = (v: (typeof satirlar)[number]['v']) =>
   }
 </script>
 <style>
-  .suzgec { display: grid; gap: 1rem; align-items: end; margin-bottom: 2rem; }
+  .suzgec { display: grid; gap: 1rem; align-items: end; margin-bottom: 2.5rem; }
   .suzgec[hidden] { display: none; }
-  .suzgec label { display: grid; gap: 0.3rem; font-weight: 600; min-width: 0; }
-  .alan { display: flex; align-items: center; gap: 0.5rem; padding-left: 0.8rem; }
-  .alan, select { background: var(--yuzey); border: 2px solid var(--soluk); border-radius: 2px; min-height: 2.9rem; font-weight: 400; min-width: 0; }
-  .alan input { flex: 1; min-width: 0; border: 0; background: none; height: 2.6rem; padding: 0 0.6rem 0 0; outline: none; caret-color: var(--zinober); }
-  .alan:focus-within { outline: 3px solid var(--odak); outline-offset: 3px; }
+  .suzgec label { display: grid; gap: 0.4rem; min-width: 0; color: var(--soluk); }
+  .alan, select { background: var(--yuzey); border: 1.5px solid #8d867c; border-radius: 99px; min-height: 3rem; min-width: 0; color: var(--kemik); }
+  .alan { display: flex; align-items: center; gap: 0.6rem; padding-left: 1.1rem; }
+  .alan input { flex: 1; min-width: 0; border: 0; background: none; height: 2.8rem; padding: 0 1rem 0 0; outline: none; caret-color: var(--mercan); }
+  .alan:focus-within { outline: 2px solid var(--kemik); outline-offset: 3px; }
   input::placeholder { color: var(--soluk); opacity: 1; }
-  select { padding: 0 0.7rem; width: 100%; }
-  .sayi { font-variant-numeric: tabular-nums; padding-bottom: 0.7rem; color: var(--soluk); }
-  .liste { border-bottom: 2px solid var(--cizgi); }
-  .liste li { display: grid; grid-template-columns: 2.75rem minmax(0, 1fr); gap: 0.4rem 1.1rem; padding-block: 1.25rem; border-top: 2px solid var(--cizgi); position: relative; }
+  select { padding: 0 1rem; width: 100%; }
+  .sayi { font-variant-numeric: tabular-nums; padding-bottom: 0.75rem; color: var(--soluk); }
+  .liste li { display: grid; grid-template-columns: 3rem minmax(0, 1fr); gap: 0.4rem 1.2rem; padding-block: 1.35rem; border-top: 1.5px solid var(--cizgi); position: relative; }
   .liste li[hidden] { display: none; }
-  .renk { grid-row: 1 / span 3; background: var(--kutu); color: var(--kutu-yazi); display: grid; place-items: center; min-height: 3.5rem; border-radius: 2px; }
-  .ana h2 { font-size: 2rem; margin-bottom: 0.3rem; }
+  .renk { grid-row: 1 / span 3; color: var(--dal); display: grid; place-items: center; width: 3rem; height: 3rem; border: 1.5px solid var(--dal); border-radius: 14px; }
+  .ana h2 { font-size: 1.5rem; margin-bottom: 0.35rem; }
   .ana h2 a { text-decoration: none; }
   .ana h2 a::after { content: ''; position: absolute; inset: 0; }
   .liste li:hover h2 a { text-decoration: underline; }
-  .yan { color: var(--soluk); font-size: 1rem; line-height: 1.45; }
+  .yan { color: var(--soluk); font-size: 1rem; line-height: 1.5; }
   .bos { padding-block: 2rem; font-size: 1.1875rem; }
   .bos button { border: 0; background: none; padding: 0.4rem 0; font-weight: 600; text-decoration: underline; cursor: pointer; }
   @media (min-width: 40rem) { .suzgec { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) 4.5rem; } }
-  @media (min-width: 60rem) { .liste li { grid-template-columns: 3.5rem minmax(0, 1fr) 14rem 12rem; gap: 0 2rem; } .renk { grid-row: auto; } }
+  @media (min-width: 60rem) { .liste li { grid-template-columns: 3rem minmax(0, 1fr) 14rem 12rem; gap: 0 2rem; } .renk { grid-row: auto; } }
 </style>

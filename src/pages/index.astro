@@ -1,82 +1,46 @@
 ---
-import { Image } from 'astro:assets';
 import Sayfa from '../duzen/Sayfa.astro';
-import Raf from '../bilesenler/Raf.astro';
+import Dal from '../bilesenler/Dal.astro';
+import Ikon from '../bilesenler/Ikon.astro';
 import { acikBolumler, site } from '../site';
-import { bolumKayitlari, isMi, tumKayitlar } from '../kutuphane/kayit';
+import { agacKur, yerlestir, type Dugum } from '../kutuphane/agac';
 
-/** Ana rafta en çok bu kadar kutu durur; kalanı bölüm sayfasındadır. */
-const RAF_SINIRI = 30;
-const raflar = await Promise.all(
-  acikBolumler.map(async (b) => ({ bolum: b, kayitlar: await bolumKayitlari(b) })),
-);
-const doluRaflar = raflar.filter((r) => r.kayitlar.length > 0);
-const masada = (await tumKayitlar())
-  .filter(isMi)
-  .filter((k) => k.veri.masada !== undefined)
-  .sort((a, b) => (a.veri.masada ?? 0) - (b.veri.masada ?? 0));
-const gorselli = masada.filter((k) => k.veri.gorseller.length > 0);
-const gorselsiz = masada.filter((k) => k.veri.gorseller.length === 0);
+const kok = await agacKur();
+const { yerler, cizgiler } = yerlestir(kok);
+const ebeveyn: Record<string, string> = {};
+const gez = (d: Dugum) => d.cocuklar.forEach((c) => { ebeveyn[c.id] = d.id; gez(c); });
+gez(kok);
+const k = yerler.get('kok')!;
+const dallar = kok.cocuklar;
 ---
-<Sayfa>
-  <div class="sar giris">
-    <h1>{site.ad}</h1>
-    <p>{site.aciklama} En son dokunduğum en başta.</p>
+<Sayfa ust={false}>
+  <header class="ust-kapsul">
+    <nav class="kapsul" aria-label="Dallar">
+      <a href="#kok" data-dal data-dugum-git="kok" aria-current="true">Hepsi</a>
+      {dallar.map((d) => <a href={`#${d.id}`} data-dal data-dugum-git={d.id} data-renk={d.renk}><Ikon ad={d.ikon} boy={18} />{d.ad}</a>)}
+    </nav>
+  </header>
+  <div class="tuval" data-tuval>
+    <canvas class="zemin" aria-hidden="true"></canvas>
+    <div class="dunya">
+      <div class="dugum kok" id="kok" data-dugum="kok" data-yer={[k.x, k.y, k.w, k.h].map(Math.round).join(' ')}>
+        <h1>{site.ad}</h1>
+        <p>{site.aciklama}</p>
+      </div>
+      <ul role="list" aria-label="Proje ağacı">{dallar.map((d) => <Dal dugum={d} yerler={yerler} />)}</ul>
+    </div>
   </div>
-  {doluRaflar.map(({ bolum, kayitlar }, sira) => (
-    <section class="sar raf-bolumu" aria-labelledby={`raf-${bolum.id}`}>
-      <h2 id={`raf-${bolum.id}`} class={doluRaflar.length === 1 && sira === 0 ? 'gizli' : undefined}>{bolum.ad}</h2>
-      <Raf kayitlar={kayitlar.slice(0, RAF_SINIRI)} ad={bolum.ad} />
-      <p class="hepsi"><a href={`/${bolum.id}/`}>{bolum.tur === 'is' ? `${kayitlar.length} işin hepsini ara ve süz` : `${bolum.ad} bölümünün tamamı`}</a></p>
-    </section>
-  ))}
-  {masada.length > 0 && (
-    <section class="sar masa" aria-labelledby="masa">
-      <h2 id="masa">Şu an masamda</h2>
-      {gorselli.map((k) => {
-        const g = k.veri.gorseller[0]!;
-        return (
-          <article class="buyuk">
-            <Image src={g.dosya} alt={g.alt} widths={[480, 800, 1200, 1600]} sizes="(min-width: 64rem) 62vw, 92vw" />
-            <div>
-              <h3><a href={k.yol}>{k.baslik}</a></h3>
-              <p>{k.ozet}</p>
-              <p class="soluk">{k.veri.teknoloji.join(', ')}</p>
-            </div>
-          </article>
-        );
-      })}
-      {gorselsiz.length > 0 && (
-        <ul class="kisa" role="list">
-          {gorselsiz.map((k) => (
-            <li>
-              <h3><a href={k.yol}>{k.baslik}</a></h3>
-              <p>{k.ozet}</p>
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
-  )}
+  <p class="ipucu" aria-hidden="true">Sürükle, tekerlekle yaklaş, bir dala ya da projeye tıkla</p>
+  <div class="araclar">
+    <div class="kapsul" role="group" aria-label="Görünüm">
+      <button type="button" data-yakin="1.35"><Ikon ad="arti" /><span class="gizli">Yaklaş</span></button>
+      <button type="button" data-yakin="0.74"><Ikon ad="eksi" /><span class="gizli">Uzaklaş</span></button>
+      {acikBolumler.map((b) => <a href={`/${b.id}/`}><Ikon ad="ara" /><span>{acikBolumler.length > 1 ? b.ad : 'Liste'}</span></a>)}
+    </div>
+  </div>
+  <script type="application/json" id="agac" is:inline set:html={JSON.stringify({ cizgiler, ebeveyn }).replaceAll('<', '\\u003c')} />
+  <div class="oda-kabi" hidden slot="son" data-oda-kabi></div>
 </Sayfa>
-<style>
-  .giris { padding-block: 1rem 1.5rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 0.75rem 3rem; }
-  .giris h1 { font-size: clamp(4rem, 13vw, 9rem); line-height: 0.82; letter-spacing: -0.02em; }
-  .giris p { max-width: 24rem; font-size: 1.1875rem; line-height: 1.4; }
-  .raf-bolumu + .raf-bolumu { margin-top: 4rem; }
-  .raf-bolumu h2 { font-size: 2.5rem; margin-bottom: 1rem; }
-  .hepsi { margin-top: 0.75rem; font-weight: 600; }
-  .hepsi a { display: inline-block; padding-block: 0.4rem; }
-  .masa { margin-top: 5.5rem; }
-  .masa h2 { font-size: clamp(2.75rem, 6vw, 4.5rem); margin-bottom: 1.75rem; }
-  .buyuk { display: grid; gap: 1.25rem 2.5rem; align-items: end; padding-bottom: 3.5rem; }
-  .buyuk img { width: 100%; border-radius: 2px; background: var(--yuzey); }
-  .buyuk h3, .kisa h3 { font-size: 2.75rem; margin-bottom: 0.6rem; }
-  .buyuk p, .kisa p { max-width: 34rem; }
-  .soluk { color: var(--soluk); margin-top: 0.6rem; }
-  h3 a { text-decoration: none; }
-  h3 a:hover { text-decoration: underline; }
-  .kisa { display: grid; gap: 2rem 3rem; border-top: 2px solid var(--cizgi); padding-top: 2rem; }
-  @media (min-width: 48rem) { .kisa { grid-template-columns: 1fr 1fr; } }
-  @media (min-width: 64rem) { .buyuk { grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); } }
-</style>
+<script>
+  import '../tuval/tuval';
+</script>

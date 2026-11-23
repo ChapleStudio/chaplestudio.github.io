@@ -1,0 +1,57 @@
+/* Akış hâli: telefon ve JavaScript'siz tarayıcı. Ağaç yine yukarıdan aşağı, dal çizgisi solda iner. */
+.tuval { padding: 2.75rem var(--kenar) 6rem; }
+.tuval ul { list-style: none; padding: 0; }
+.tuval .zemin { display: none; }
+.kok { display: block; }
+.kok h1 { font-size: clamp(3.6rem, 19vw, 7rem); letter-spacing: -0.06em; line-height: 0.86; }
+.kok p { color: var(--soluk); margin-top: 1rem; max-width: 24rem; }
+.dal { display: inline-flex; align-items: center; gap: 0.7rem; min-height: 3.2rem; padding: 0 1.2rem; border-radius: 99px; border: 1.5px solid var(--dal); background: var(--yuzey); font-weight: 700; font-size: 1.15rem; text-decoration: none; letter-spacing: -0.02em; transition: background-color 200ms, color 200ms; }
+.dal svg { color: var(--dal); transition: color 200ms; }
+.dal .sayi { color: var(--soluk); font-weight: 500; font-variant-numeric: tabular-nums; }
+.dal:hover, .dal:focus-visible { background: var(--dal); color: var(--zemin); }
+.dal:hover :is(svg, .sayi), .dal:focus-visible :is(svg, .sayi) { color: inherit; }
+.tuval:not([data-acik]) li[data-tur='dal'], .tuval:not([data-acik]) li[data-tur='bolum'] { margin-top: 3rem; scroll-margin-top: 5rem; }
+.tuval:not([data-acik]) li[data-tur='dal'] > ul { margin: 0 0 0 1.4rem; padding: 1.4rem 0 0 1.4rem; border-left: 2px solid var(--dal); display: grid; gap: 1.1rem; }
+.tuval:not([data-acik]) li[data-tur='kayit'] { position: relative; }
+.tuval:not([data-acik]) li[data-tur='kayit']::before { content: ''; position: absolute; left: -1.4rem; top: 4.5rem; width: 1.4rem; height: 2px; background: var(--dal); }
+.ust-kapsul { position: sticky; top: 0.75rem; z-index: 20; display: flex; justify-content: center; padding: 0.75rem 0.75rem 0; }
+.araclar { display: none; }
+
+/* Tuval hâli */
+html[data-tuval-acik] body { overflow: hidden; }
+html[data-tuval-acik] .ust-kapsul { position: fixed; inset: 1.1rem 0 auto; padding: 0; pointer-events: none; }
+html[data-tuval-acik] .ust-kapsul > * { pointer-events: auto; }
+.tuval[data-acik] { position: fixed; inset: 0; padding: 0; overflow: clip; cursor: grab; touch-action: none; user-select: none; }
+.tuval[data-acik][data-tutuldu] { cursor: grabbing; }
+.tuval[data-acik] .zemin { display: block; position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; }
+.tuval[data-acik] .dunya { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.tuval[data-acik] .dugum { position: absolute; transition: opacity 420ms var(--cikis), border-color 200ms, box-shadow 200ms, background-color 200ms, color 200ms, scale 520ms var(--cikis); }
+.tuval[data-acik] .dugum[data-kapali] { opacity: 0; scale: 0.82; }
+.tuval[data-acik] .dugum[data-sonuk] { opacity: 0.13; }
+.tuval[data-acik] .kok { text-align: center; text-decoration: none; display: grid; align-content: center; }
+.tuval[data-acik] .kok h1 { font-size: 168px; line-height: 0.9; white-space: nowrap; }
+.tuval[data-acik] .kok p { margin: 22px auto 0; font-size: calc(22px * var(--iri, 1)); max-width: none; line-height: 1.2; }
+.tuval[data-acik] .dal { justify-content: center; font-size: calc(25px * min(var(--iri, 1), 1.4)); gap: 16px; padding: 0 18px; white-space: nowrap; }
+.tuval[data-acik] .kart .gorsel { min-height: 0; }
+.tuval[data-acik] .kart:hover { scale: 1.035; z-index: 2; }
+.tuval[data-acik] .kart .ad { padding: 11px 16px 14px; }
+.tuval[data-acik] .kart strong { font-size: calc(19px * var(--iri, 1)); }
+.tuval[data-acik] .kart .alt { font-size: 14px; }
+.tuval[data-acik] .kart[data-genis] strong { font-size: calc(32px * min(var(--iri, 1), 1.2)); }
+.tuval[data-acik] .kart[data-genis] .alt { font-size: 17px; }
+.tuval[data-acik] .dunya[data-uzak] .kart:not([data-genis]) .alt { display: none; }
+html[data-tuval-acik] .araclar { position: fixed; right: 1.1rem; bottom: 1.1rem; z-index: 20; display: flex; }
+html[data-tuval-acik] .araclar .kapsul button, html[data-tuval-acik] .araclar .kapsul a { padding: 0 0.85rem; }
+.ipucu { display: none; }
+html[data-tuval-acik] .ipucu { display: block; position: fixed; left: 1.4rem; bottom: 1.6rem; z-index: 15; color: var(--soluk); font-size: 0.95rem; pointer-events: none; transition: opacity 400ms; }
+html[data-tuval-acik] .ipucu[data-bitti] { opacity: 0; }
+
+/* Düğümün içine girme */
+.gecit { position: fixed; z-index: 30; background: #0f0e0e radial-gradient(90% 75% at 62% 30%, color-mix(in srgb, var(--dal) 20%, var(--zemin)), var(--zemin) 75%); overflow: hidden; max-width: none; }
+.oda-kabi { position: fixed; inset: 0; z-index: 40; overflow-y: auto; background: var(--zemin); }
+.oda-kabi[hidden] { display: none; }
+.oda-kabi .oda-baslik, .oda-kabi .oda-ust { animation: belir 620ms var(--cikis) both; }
+.oda-kabi .oda-baslik { animation-delay: 60ms; }
+.oda-kabi[data-cikiyor] { opacity: 0; transition: opacity 180ms; }
+@keyframes belir { from { opacity: 0; translate: 0 26px; filter: blur(8px); } }
+html[data-oda] { overflow: hidden; }

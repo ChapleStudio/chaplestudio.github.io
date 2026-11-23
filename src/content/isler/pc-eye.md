@@ -1,12 +1,12 @@
 ---
 baslik: PC-Eye
 ozet: Yapay zekâ ajanlarının Linux masaüstünü ekran görüntüsü tahmin etmeden görüp kullanmasını sağlayan araç.
+sahne: tarama
 cesit: masaustu
 kapsam: 3
 baslangic: 2026-10-17
 guncelleme: 2026-11-21
 suruyor: true
-masada: 3
 teknoloji: [Rust, Wayland, MCP]
 platform: [Linux]
 baglantilar:

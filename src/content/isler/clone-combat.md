@@ -1,6 +1,7 @@
 ---
 baslik: Clone Combat
 ozet: Her ölümünde arkanda hareketlerini tekrar eden bir hayalet bırakan, çevrimiçi 2B platform nişancı oyunu.
+sahne: hayalet
 cesit: oyun
 kapsam: 2
 baslangic: 2026-03-10

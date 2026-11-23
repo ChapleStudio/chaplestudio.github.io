@@ -1,6 +1,7 @@
 ---
 baslik: Bildirim Kaydedici
 ozet: Telefona gelen bildirimleri cihazın içinde saklayıp listeleyen Android uygulaması.
+sahne: bildirim
 cesit: mobil
 kapsam: 1
 baslangic: 2026-04-12

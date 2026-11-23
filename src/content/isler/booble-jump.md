@@ -1,6 +1,7 @@
 ---
 baslik: Booble Jump
 ozet: Telefonu sağa sola eğerek oynanan, rastgele platformlarla sonsuza kadar yükselen zıplama oyunu.
+sahne: ziplama
 cesit: oyun
 kapsam: 1
 baslangic: 2026-02-23
