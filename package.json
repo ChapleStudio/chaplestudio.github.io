@@ -1,0 +1,1 @@
+{"name":"chaple-studio","private":true,"scripts":{"dev":"wrangler pages dev site --port 8788","deploy":"wrangler pages deploy site --project-name chaplestudio --branch main"},"devDependencies":{"wrangler":"^4.166.0"}}
