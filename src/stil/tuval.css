@@ -17,6 +17,17 @@
 .ust-kapsul { position: sticky; top: 0.75rem; z-index: 20; display: flex; justify-content: center; padding: 0.75rem 0.75rem 0; }
 .araclar { display: none; }
 
+/* İlk kare: geniş ekranda betik ağacı kurana kadar telefon düzeni hiç görünmez. Betik hiç çalışmazsa 4 saniye sonra liste görünür. */
+@media (scripting: enabled) and (min-width: 52rem) and (min-height: 30rem) {
+  html:has([data-tuval]) body { overflow: hidden; }
+  html:has([data-tuval]) .ust-kapsul { position: fixed; inset: 1.1rem 0 auto; padding: 0; }
+  .tuval:not([data-acik]) { position: fixed; inset: 0; overflow: auto; visibility: hidden; animation: yedek-goster 0s 4s forwards; }
+  html:not([data-tuval-acik]) :is(.araclar, .ipucu) { visibility: hidden; }
+}
+@keyframes yedek-goster { to { visibility: visible; } }
+/* Kurulurken geçiş yok: düğümler görünüp sönmeden kapalı başlar. */
+.tuval[data-kuruluyor] .dugum { transition: none !important; }
+
 /* Tuval hâli */
 html[data-tuval-acik] body { overflow: hidden; }
 html[data-tuval-acik] .ust-kapsul { position: fixed; inset: 1.1rem 0 auto; padding: 0; pointer-events: none; }

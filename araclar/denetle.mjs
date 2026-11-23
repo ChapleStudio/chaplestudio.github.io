@@ -179,6 +179,37 @@ for (const [ad, gorunum] of [['masaüstü', { width: 1440, height: 900 }], ['tel
   }
   await t.close();
 }
+// 5) İlk kare: ağaç kurulmadan düz liste ya da sönen düğüm görünmemeli; betiksiz tarayıcıda liste görünmeli
+for (const adres of ['/', '/#isler-oyun']) {
+  const t = await hareketli.newPage();
+  await t.setViewport({ width: 1262, height: 800 });
+  await (await t.createCDPSession()).send('Emulation.setCPUThrottlingRate', { rate: 6 });
+  await t.evaluateOnNewDocument(() => {
+    window.__ilk = { duz: 0, sonen: 0 };
+    const bak = () => {
+      const v = document.querySelector('[data-tuval]');
+      if (v && !v.hasAttribute('data-acik') && getComputedStyle(v).visibility === 'visible') __ilk.duz++;
+      __ilk.sonen += [...document.querySelectorAll('.dugum[data-kapali]')].filter((d) => Number(getComputedStyle(d).opacity) > 0.05).length;
+      if (performance.now() < 1200) requestAnimationFrame(bak);
+    };
+    requestAnimationFrame(bak);
+  });
+  await t.goto(taban + adres, { waitUntil: 'load' });
+  await bekle(1500);
+  const { duz, sonen } = await t.evaluate(() => __ilk);
+  if (duz) sorun(adres, `ilk ${duz} karede düz liste göründü`);
+  if (sonen) sorun(adres, `${sonen} kez kapalı düğüm görünüp söndü`);
+  await t.close();
+}
+{
+  const t = await hareketli.newPage();
+  await t.setJavaScriptEnabled(false);
+  await t.setViewport({ width: 1262, height: 800 });
+  await t.goto(`${taban}/`, { waitUntil: 'load' });
+  const kart = await t.$('[data-kart]');
+  if (!(await kart?.isVisible())) sorun('/', 'betiksiz tarayıcıda liste görünmüyor');
+  await t.close();
+}
 await hareketli.close();
 sunucu.close();
 

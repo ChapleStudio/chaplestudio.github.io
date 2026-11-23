@@ -1,4 +1,6 @@
 ---
+import latin from '@fontsource-variable/schibsted-grotesk/files/schibsted-grotesk-latin-wght-normal.woff2?url';
+import latinEk from '@fontsource-variable/schibsted-grotesk/files/schibsted-grotesk-latin-ext-wght-normal.woff2?url';
 import '../stil/temel.css';
 import '../stil/tuval.css';
 import { acikBolumler, site } from '../site';
@@ -17,6 +19,8 @@ const yol = Astro.url.pathname;
     <title>{tamBaslik}</title>
     <meta name="description" content={aciklama} />
     {dizinleme ? <link rel="canonical" href={asil} /> : <meta name="robots" content="noindex" />}
+    <link rel="preload" href={latin} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={latinEk} as="font" type="font/woff2" crossorigin />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="alternate" type="application/rss+xml" title={site.ad} href="/rss.xml" />
     <link rel="sitemap" href="/sitemap-index.xml" />

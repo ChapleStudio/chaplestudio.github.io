@@ -644,7 +644,9 @@ function kur() {
   if (!once) isaretle(dal);
 }
 const ilkKimlik = decodeURIComponent(location.hash.slice(1));
+tuval.setAttribute('data-kuruluyor', '');
 kur();
+requestAnimationFrame(() => requestAnimationFrame(() => tuval.removeAttribute('data-kuruluyor')));
 if (dugumler.has(ilkKimlik) && ilkKimlik !== 'kok') {
   buyume = 9;
   ipucu.setAttribute('data-bitti', '');
