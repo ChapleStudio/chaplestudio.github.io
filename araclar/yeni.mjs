@@ -22,7 +22,7 @@ const sablon = {
 baslik: ${tirnak}
 ozet: Ne yaptığını bir cümleyle yaz, en az 20 karakter.
 cesit: oyun # oyun | motor | masaustu | mobil
-kapsam: 1 # kutunun kalınlığı, 1-4
+kapsam: 1 # 1 küçük deneme, 4 büyük proje (geniş düğüm)
 baslangic: ${bugun}
 guncelleme: ${bugun}
 suruyor: true

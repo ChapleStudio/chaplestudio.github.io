@@ -549,6 +549,7 @@ const ilkKimlik = decodeURIComponent(location.hash.slice(1));
 kur();
 if (dugumler.has(ilkKimlik) && ilkKimlik !== 'kok') {
   buyume = 9;
+  ipucu.setAttribute('data-bitti', '');
   const hedef = yaprakMi(ilkKimlik) ? (ust(ilkKimlik) ?? 'kok') : ilkKimlik;
   isaretle(hedef);
   if (acik) {

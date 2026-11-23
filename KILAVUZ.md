@@ -6,7 +6,11 @@
 npm run yeni -- isler "Oyunumun Adı"
 ```
 
-`src/content/isler/` içinde hazır bir dosya oluşur. Doldur, `taslak: true` satırını sil. Ekran görüntülerini `src/assets/isler/<ad>/` klasörüne koy. Raf, liste, süzgeç, RSS ve site haritası kendiliğinden güncellenir.
+`src/content/isler/` içinde hazır bir dosya oluşur. Doldur, `taslak: true` satırını sil. Ekran görüntülerini `src/assets/isler/<ad>/` klasörüne koy. Düğümü ağaçta kendiliğinden yerini alır; liste, süzgeç, RSS ve site haritası kendiliğinden güncellenir.
+
+## Düğümün canlı sahnesi
+
+`sahne:` alanına `src/tuval/sahne-kimlikleri.ts` içindeki adlardan birini yaz. Boş bırakırsan ada özgü bir desen çizilir. Yeni sahne için adı oraya, çizimi `src/tuval/sahneler.ts` içine ekle.
 
 ## Yeni bölüm açmak (blog gibi)
 
@@ -19,7 +23,7 @@ npm run yeni -- gunluk "İlk yazım"
 ## Yeni içerik türü (müzik, çizim…)
 
 1. `src/turler/semalar.ts`: alanları tanımla.
-2. `src/kutuphane/kayit.ts`: `VeriTipleri` ve `rafBilgisi`ne ekle (kutunun rengi, ikonu, kalınlığı).
+2. `src/kutuphane/kayit.ts`: `VeriTipleri` ve `dugumBilgisi`ne ekle (hangi dala asılacağı, rengi, ikonu).
 3. `src/turler/<tür>/Liste.astro` ve `Detay.astro`; `src/pages/[bolum]/` içindeki iki dosyada çağır.
 
 Eksik bırakılan adımı tip denetimi söyler.

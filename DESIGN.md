@@ -2,47 +2,40 @@
 
 ## Fikir
 
-Site bir **raf**. Her iş rafta duran bir kutu sırtı, her bölüm (işler, ileride günlük, çizim, müzik…) ayrı bir raf. Yeni iş eklemek rafa kutu koymak, yeni bölüm açmak duvara raf asmaktır. Düzen, içerik büyüdükçe bozulmaz: kutular satıra sığmazsa alttaki tahtaya geçer.
-
-İlk görülen şey slogan değil, rafın kendisidir. Masaüstünde kutular dik durur; telefonda aynı kutular yatık üst üste dizilir.
+Site yukarıdan aşağı dallanan bir **düğüm ağacı**: Chaple Studio → (bölüm) → dal → proje. Rowl Engine'in hikâye tuvalinden gelir. Dala tıklayınca kamera ona uçar, projeye tıklayınca düğüm ekranı kaplar ve içine girilir. İçerik büyüdükçe ağaç büyür; yerleşim `src/kutuphane/agac.ts` içinde hesaplanır, elle konum verilmez.
 
 ## Renk
 
-Renk süs değildir, işin **türünü** söyler. Bu listede olmayan renk kullanılmaz.
+Tek, koyu tema. Renk dalı söyler; listede olmayan renk kullanılmaz.
 
-| Ad | Açık | Koyu | Görev |
-|---|---|---|---|
-| duvar | `#d9dfe1` | `#20272c` | Sayfa zemini |
-| yüzey | `#eef1f2` | `#2a3238` | Form alanı, görsel zemini |
-| mürekkep | `#15191d` | `#eef1f2` | Metin, raf tahtası (açık) |
-| soluk | `#465058` | `#b3bdc3` | İkincil metin |
-| çizgi | `#aab4b9` | `#4a555c` | Ayırıcı |
-| zinober | `#c0301d` | `#c93a27` | Oyun |
-| lacivert | `#22399b` | `#3f58c8` | Motor ve altyapı |
-| çam | `#1d5b45` | `#2a7759` | Masaüstü aracı |
-| hardal | `#e6a417` | `#e6a417` | Mobil ve tarayıcı |
-| kâğıt | `#f7f8f6` | `#f7f8f6` | Yazı türündeki bölümler |
-
-Zinober, lacivert ve çam üstünde beyaz; hardal ve kâğıt üstünde mürekkep yazılır. Koyu tema kişinin sistem ayarını izler.
+| Ad | Değer | Görev |
+|---|---|---|
+| zemin | `#0b0b0b` | Tuval |
+| yüzey | `#151413`, `#1f1d1b` | Düğüm, kapsül |
+| çizgi | `#3a3631`, `#4d4740` | Kenar |
+| kemik | `#e9e3d8` | Metin, kök, yazılar |
+| soluk | `#aaa399` | İkincil metin |
+| mercan | `#e76f8b` | Oyunlar, fare etkisi |
+| altın | `#e0b06c` | Motorlar |
+| adaçayı | `#86bfa6` | Masaüstü |
+| leylak | `#a9a7ee` | Mobil ve tarayıcı |
 
 ## Yazı
 
-- **Sofia Sans Extra Condensed**: kutu sırtları ve başlıklar. Dar olduğu için uzun adlar sırta sığar. Ağırlık 800.
-- **Sofia Sans**: metin. 17–19 px, satır 1.55, en çok 68 karakter.
-- İkisi de siteden sunulur, Türkçe karakterleri vardır. Başka sunucuya istek gitmez.
-- Tamamı büyük harf etiket, başlık üstü küçük etiket, tek sözcüğü renkli başlık yok.
+Schibsted Grotesk, tek aile, siteden sunulur. Başlık 750 ve sıkı, metin 400, en çok 66 karakter. Tamamı büyük harf etiket ve başlık üstü küçük etiket yok.
 
-## Biçim
+## Düğüm
 
-- Kutular köşeli (2 px). Yuvarlak kart, cam, gradyan yazı, gölge süsü yok.
-- Kutu kalınlığı işin kapsamını gösterir (`kapsam: 1–4`). Rastgele değildir.
-- Ekran görüntüsü varsa gerçektir. Yoksa görsel uydurulmaz, kutu tek başına yeter.
-- İkonlar tek elden çizilmiş SVG, 1.75 çizgi. Emoji ve Unicode simge yok.
+Proje düğümünde ekran görüntüsü yerine ne yaptığını anlatan küçük bir canlı sahne oynar. Sahneler 200 birim yüksekliğinde çizilir, yakınlaşınca gerçekten büyür. Gerçek ekran görüntüleri proje sayfasındadır. Üzerinde çalışılan projenin köşesinde nokta durur.
 
 ## Hareket
 
-Tek yazılmış an: raftan seçilen kutu, iş sayfasının başlık bloğuna dönüşür (belgeler arası view transition). Fareyle gelince kutu biraz yükselir. Kaydırınca beliren öğe yok. `prefers-reduced-motion` hepsini kapatır.
+- Açılışta dallar kökten büyür, bir kez.
+- Dallarda ışık akar; seçilen dala ışık dalgası iner, ötekiler kararır.
+- Kamera yolu yakınlaşmayı ve kaydırmayı birlikte yapar (van Wijk).
+- Girişte düğümün sahnesi ekranı kaplar, çıkışta aynı yoldan geri döner.
+- `prefers-reduced-motion` hepsini kapatır.
 
-## Dil
+## Erişim
 
-Türkçe, birinci tekil, kısa. Övgü sıfatı yok; ne yaptığı, neyle yapıldığı ve durumu yazılır. Düğme eylemi söyler: "Android için indir", "Kaynak kodu".
+Ağaç gerçek bir bağlantı listesidir. JavaScript yoksa ve telefonda yukarıdan aşağı akar. Ok tuşları düğümler arasında gezer, Esc bir kat çıkar, her projenin kendi adresi vardır.
