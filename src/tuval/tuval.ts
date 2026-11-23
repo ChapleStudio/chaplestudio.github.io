@@ -1,3 +1,4 @@
+import { canliTut, dongu } from './tempo';
 import { ucusYolu, yumusak, type Kamera, type Kutu } from './kamera';
 import { bekletSahneleri, hizliSahne, ODA_DOLULUK, olcekVer, paletAl, sahneCiz, sahneleriEkle } from './sahnelik';
 import { sahneBul } from './sahneler';
@@ -72,7 +73,7 @@ function uc(hedef: Kamera, sure?: number, her?: (p: number) => void): Promise<vo
   hiz = { x: 0, y: 0 };
   const yol = ucusYolu(kam, hedef, W);
   const ms = sakin.matches ? 0 : (sure ?? Math.min(1500, Math.max(520, yol.uzunluk * 620)));
-  return new Promise((bitti) => {
+  return canliTut(new Promise<void>((bitti) => {
     let iptal = false;
     const bas = performance.now();
     ucus = { iptal: () => { iptal = true; bitti(); } };
@@ -86,7 +87,7 @@ function uc(hedef: Kamera, sure?: number, her?: (p: number) => void): Promise<vo
       else { ucus = null; olcekVer(kam.z); bitti(); }
     };
     adim(bas);
-  });
+  }));
 }
 
 /* ---------- Dal seçme ---------- */
@@ -120,6 +121,7 @@ function dalaGit(id: string, gecmis: boolean) {
   isaretle(id);
   ipucu.setAttribute('data-bitti', '');
   dalga = { bas: performance.now(), ids: new Set(altlar(id).slice(1)), kat: derinlik(id) };
+  void canliTut(new Promise((b) => setTimeout(b, 2500)));
   if (acik) void uc(dalGorunumu(id));
   else (id === 'kok' ? document.documentElement : document.getElementById(id))?.scrollIntoView({ behavior: sakin.matches ? 'auto' : 'smooth', block: 'start' });
 }
@@ -307,11 +309,11 @@ async function cik(hedefDal: string, etiketler: string[] = []) {
   if (etiketler.length) { panelGoster(false); etiketSec(etiketler); }
   kart?.focus({ preventScroll: acik });
 }
-const sure = (ms: number, her: (p: number) => void) => new Promise<void>((bitti) => {
+const sure = (ms: number, her: (p: number) => void) => canliTut(new Promise<void>((bitti) => {
   const bas = performance.now();
   const adim = (an: number) => { const p = Math.min(1, Math.max(0, (an - bas) / ms)); her(p); if (p < 1) requestAnimationFrame(adim); else bitti(); };
   adim(bas);
-});
+}));
 const ikiKare = () => new Promise<void>((b) => requestAnimationFrame(() => requestAnimationFrame(() => b())));
 const dalAdi = (yol: string) => { const k = kartBul(yol); return k ? (ust(k.dataset['dugum']!) ?? 'kok') : 'kok'; };
 
@@ -419,7 +421,7 @@ function parlakIz(n: Float32Array, a: number, b: number, kalin: number, alfa: nu
   for (const [kat, o] of [[5, 0.1], [2.6, 0.2], [1, 1]] as const) { c2d.globalAlpha = alfa * o; c2d.lineWidth = kalin * kat; izCiz(n, a, b); }
 }
 function zeminCiz(an: number) {
-  const d = Math.min(devicePixelRatio, 2);
+  const d = Math.min(devicePixelRatio, 1.25);
   if (zemin.width !== Math.round(W * d) || zemin.height !== Math.round(H * d)) { zemin.width = Math.round(W * d); zemin.height = Math.round(H * d); }
   c2d.setTransform(d, 0, 0, d, 0, 0);
   c2d.clearRect(0, 0, W, H);
@@ -470,7 +472,6 @@ function zeminCiz(an: number) {
   }
   c2d.globalAlpha = 1;
 }
-let tik = 0;
 function kare(an: number) {
   if (acik && kap.hidden) {
     if (buyume < 9) {
@@ -485,9 +486,8 @@ function kare(an: number) {
       sinirla();
       uygula();
     }
-    if (ucus || tutulan || buyume < 9 || tik++ % 2 === 0) zeminCiz(an);
+    zeminCiz(an);
   }
-  requestAnimationFrame(kare);
 }
 
 /* ---------- Girdi ---------- */
@@ -673,4 +673,7 @@ if (ilkEtiketler.length) {
 }
 addEventListener('resize', kur);
 genisEkran.addEventListener('change', kur);
-requestAnimationFrame(kare);
+// Açılış büyümesi ve dal ışığı bitene kadar tam hız.
+void canliTut(new Promise((b) => setTimeout(b, buyume < 9 ? 4200 : 1500)));
+const birKare = dongu(kare, () => 60, () => 12);
+addEventListener('resize', () => birKare());

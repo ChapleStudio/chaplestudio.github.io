@@ -1,3 +1,4 @@
+import { dongu } from './tempo';
 import { sahneBul, type Cizici, type Palet } from './sahneler';
 
 interface Oyuncu { tuval: HTMLCanvasElement; cizici: Cizici; palet: Palet; gorunur: boolean; kirli: boolean }
@@ -26,7 +27,7 @@ export function paletAl(el: Element): Palet {
 
 const gozcu = new IntersectionObserver((g) => g.forEach((e) => {
   const o = oyuncular.get(e.target as HTMLCanvasElement);
-  if (o) { o.gorunur = e.isIntersecting; o.kirli = true; }
+  if (o) { o.gorunur = e.isIntersecting; o.kirli = true; birKare(); }
 }), { rootMargin: '80px' });
 
 /** Sahneler hep 200 birim yüksekliğinde çizilir; yakınlaşınca gerçekten büyürler. `doluluk` sahnenin kapladığı yükseklik oranıdır. */
@@ -50,25 +51,31 @@ export function sahneleriEkle(kok: ParentNode) {
     oyuncular.set(t, { tuval: t, cizici: sahneBul(t.dataset['sahne'], t.dataset['kayit'] ?? ''), palet: paletAl(t), gorunur: true, kirli: true });
     gozcu.observe(t);
   }
+  requestAnimationFrame(() => birKare());
 }
 
-let sayac = 0;
+let sira = 0;
+/** Her turda oda sahnesi ile üzerine gelinen sahne, yanlarında da sırayla birkaç kart çizilir. */
 function kare() {
-  sayac++;
-  let sira = 0;
+  const hazir: Oyuncu[] = [];
   for (const [t, o] of oyuncular) {
     if (!t.isConnected) { oyuncular.delete(t); gozcu.unobserve(t); continue; }
-    sira++;
-    const buyuk = t.classList.contains('oda-sahne');
-    if (!o.gorunur || (bekle && !buyuk)) continue;
-    if (sakin.matches ? !o.kirli : !(buyuk || t === hizli || (sayac + sira) % 3 === 0 || o.kirli)) continue;
-    const d = Math.min(devicePixelRatio, 2);
-    const kat = buyuk ? Math.min(d, 1.5) : Math.min(2.5, Math.max(0.5, Math.ceil(d * olcek * 2) / 2));
-    sahneCiz(t, o.cizici, o.palet, t.clientWidth, t.clientHeight, kat, buyuk ? ODA_DOLULUK : 1);
-    o.kirli = false;
+    const oda = t.classList.contains('oda-sahne');
+    if (!o.gorunur || (bekle && !oda) || (sakin.matches && !o.kirli)) continue;
+    if (oda || t === hizli || o.kirli) ciz(o, oda);
+    else hazir.push(o);
   }
-  requestAnimationFrame(kare);
+  const pay = Math.ceil(hazir.length / 4);
+  for (let i = 0; i < pay; i++) ciz(hazir[(sira + i) % hazir.length]!, false);
+  sira = (sira + pay) % Math.max(hazir.length, 1);
 }
-addEventListener('resize', () => oyuncular.forEach((o) => { o.kirli = true; }));
+function ciz(o: Oyuncu, oda: boolean) {
+  const d = Math.min(devicePixelRatio, 2), t = o.tuval;
+  const kat = oda ? Math.min(d, 1.25) : Math.min(2, Math.max(0.5, Math.ceil(d * olcek * 2) / 2));
+  sahneCiz(t, o.cizici, o.palet, t.clientWidth, t.clientHeight, kat, oda ? ODA_DOLULUK : 1);
+  o.kirli = false;
+}
+const birKare = dongu(kare, () => 40, () => 8);
+addEventListener('resize', () => { oyuncular.forEach((o) => { o.kirli = true; }); birKare(); });
 sahneleriEkle(document);
-requestAnimationFrame(kare);
+

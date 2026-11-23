@@ -37,6 +37,7 @@ Proje düğümünde ekran görüntüsü yerine ne yaptığını anlatan küçük
 - Kamera yolu yakınlaşmayı ve kaydırmayı birlikte yapar (van Wijk).
 - Girişte düğümün sahnesi ekranı kaplar, çıkışta aynı yoldan geri döner.
 - `prefers-reduced-motion` hepsini kapatır.
+- Enerji: bütün döngüler `src/tuval/tempo.ts` üzerinden zamanlanır. Etkileşimde 60, boşta 12 kare/sn; 25 saniye dokunulmazsa, pencere arkadaysa ya da gizliyse hiç çizilmez. Yeni efekt kendi `requestAnimationFrame` döngüsünü açmaz.
 
 ## Erişim
 
