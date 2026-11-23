@@ -65,6 +65,15 @@ async function sayfayiDenetle(s) {
       await sayfa.evaluate(() => document.fonts.ready.then(() => undefined));
       const tasma = await sayfa.evaluate(() => document.documentElement.scrollWidth - innerWidth);
       if (tasma > 0) sorun(yer, `yatay taşma ${tasma}px`);
+      const tasanKutular = await sayfa.$$eval('.kutu', (kutular) =>
+        kutular.filter((k) => {
+          const d = k.getBoundingClientRect();
+          return [...k.querySelectorAll('.sirt, .isaret, .yil')].some((c) => {
+            const r = c.getBoundingClientRect();
+            return r.top < d.top - 1 || r.bottom > d.bottom + 1 || r.left < d.left - 1 || r.right > d.right + 1 || c.scrollHeight > c.clientHeight + 4 && getComputedStyle(c).writingMode !== 'horizontal-tb';
+          });
+        }).map((k) => k.dataset.baslik));
+      if (tasanKutular.length) sorun(yer, `kutudan taşan yazı: ${tasanKutular.slice(0, 4).join(', ')}`);
       if (axeGenislikleri.has(en)) {
         await sayfa.evaluate(axe); // CDP ile çalışır, CSP'ye takılmaz
         const sonuc = await sayfa.evaluate(() => axe.run({ runOnly: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'] }));
@@ -75,7 +84,12 @@ async function sayfayiDenetle(s) {
   }
   await sayfa.close();
 }
-const kuyruk = [...sayfalar];
+const yonlendirme = (s) => readFileSync(join(kok, dosyalar[sayfalar.indexOf(s)]), 'utf8').includes('http-equiv="refresh"');
+const kuyruk = sayfalar.filter((s) => !yonlendirme(s));
+for (const [i, s] of sayfalar.entries()) {
+  const hedef = readFileSync(join(kok, dosyalar[i]), 'utf8').match(/http-equiv="refresh" content="0;url=([^"]+)"/)?.[1];
+  if (hedef && !dosyaBul(hedef)) sorun(s, `yönlendirme hedefi yok ${hedef}`);
+}
 await Promise.all(Array.from({ length: 4 }, async () => {
   for (let s = kuyruk.shift(); s; s = kuyruk.shift()) await sayfayiDenetle(s);
 }));

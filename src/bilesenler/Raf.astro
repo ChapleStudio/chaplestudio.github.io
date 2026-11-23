@@ -1,6 +1,6 @@
 ---
 import Ikon from './Ikon.astro';
-import { ayYilYaz, type Kayit } from '../kutuphane/kayit';
+import { ayYilYaz, sirtBoyu, type Kayit } from '../kutuphane/kayit';
 interface Props { kayitlar: Kayit[]; ad: string }
 const { kayitlar, ad } = Astro.props;
 const ilk = kayitlar[0];
@@ -9,7 +9,7 @@ const ilk = kayitlar[0];
   <ul class="raf" role="list" aria-label={ad}>
     {kayitlar.map((k) => (
       <li>
-        <a href={k.yol} class="kutu" data-kutu={k.yol} data-renk={k.renk} data-ikon={k.ikon} data-kapsam={k.kapsam} data-baslik={k.baslik} data-ozet={k.ozet} data-bilgi={`${k.turAdi}, ${ayYilYaz(k.tarih)}`}>
+        <a href={k.yol} class="kutu" data-kutu={k.yol} data-renk={k.renk} data-ikon={k.ikon} data-kapsam={k.kapsam} data-sirt={sirtBoyu(k) * 10} data-baslik={k.baslik} data-ozet={k.ozet} data-bilgi={`${k.turAdi}, ${ayYilYaz(k.tarih)}`}>
           <span class="isaret"><Ikon ad={k.ikon} boy={22} /></span>
           <span class="sirt">{k.sirtAdi}</span>
           <span class="gizli">, {k.turAdi}, </span>
@@ -51,17 +51,26 @@ const ilk = kayitlar[0];
 
   @media (min-width: 48rem) {
     .raf { --satir: 27rem; --kalinlik: 0.75rem; display: flex; flex-wrap: wrap; gap: 0 3px;
-      background: repeating-linear-gradient(to bottom, transparent 0 calc(var(--satir) - var(--kalinlik)), var(--tahta) calc(var(--satir) - var(--kalinlik)) var(--satir)); }
+      background: linear-gradient(to bottom, transparent calc(100% - var(--kalinlik)), var(--tahta) 0) top left / 100% var(--satir) repeat-y; }
     .raf li { height: var(--satir); padding-bottom: var(--kalinlik); display: flex; align-items: flex-end; }
     .kutu { writing-mode: vertical-rl; rotate: 180deg; justify-content: space-between; gap: 0.75rem; padding: 1rem 0; width: var(--en); height: var(--boy); transition: translate 260ms var(--cikis); }
     .kutu .isaret { rotate: 180deg; order: 3; }
     .kutu .sirt { flex: 1; }
     .kutu .yil { order: 0; writing-mode: horizontal-tb; rotate: 180deg; }
     .kutu .sirt { order: 1; }
-    .kutu[data-kapsam='1'] { --en: 3.25rem; --sirt: 1.8rem; }
-    .kutu[data-kapsam='2'] { --en: 4.5rem; --sirt: 2.6rem; }
-    .kutu[data-kapsam='3'] { --en: 6rem; --sirt: 3.7rem; }
-    .kutu[data-kapsam='4'] { --en: 8.5rem; --sirt: 4.9rem; }
+    .kutu[data-kapsam='1'] { --en: 3.25rem; }
+    .kutu[data-kapsam='2'] { --en: 4.5rem; }
+    .kutu[data-kapsam='3'] { --en: 6rem; }
+    .kutu[data-kapsam='4'] { --en: 8.5rem; }
+    .kutu[data-sirt='12'] { --sirt: 1.2rem; }
+    .kutu[data-sirt='15'] { --sirt: 1.5rem; }
+    .kutu[data-sirt='18'] { --sirt: 1.8rem; }
+    .kutu[data-sirt='22'] { --sirt: 2.2rem; }
+    .kutu[data-sirt='26'] { --sirt: 2.6rem; }
+    .kutu[data-sirt='31'] { --sirt: 3.1rem; }
+    .kutu[data-sirt='37'] { --sirt: 3.7rem; }
+    .kutu[data-sirt='43'] { --sirt: 4.3rem; }
+    .kutu[data-sirt='49'] { --sirt: 4.9rem; }
     .kutu[data-ikon='motor'] { --boy: 25rem; }
     .kutu[data-ikon='masaustu'] { --boy: 23rem; }
     .kutu[data-ikon='oyun'] { --boy: 20.5rem; }

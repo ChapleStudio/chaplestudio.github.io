@@ -5,10 +5,17 @@ import { cesitKimlikleri } from './is/cesitler';
 const httpsAdres = z.url({ protocol: /^https$/ });
 const adresParcasi = z.string().regex(/^[a-z0-9-]+(\/[a-z0-9-]+)*$/, 'Yalnız küçük harf, rakam, tire ve / kullan');
 
+/** Kutu sırtına en küçük yazı boyunda bile sığan karakter sayısı. */
+export const SIRT_SINIRI = 22;
+const sirtaSigar = (d: { baslik: string; sirtAdi?: string | undefined }) => d.sirtAdi !== undefined || d.baslik.length <= SIRT_SINIRI;
+const sirtHatasi = { error: `başlık ${SIRT_SINIRI} karakterden uzun: kutu sırtı için kısa bir sirtAdi yaz`, path: ['sirtAdi'] };
+
 /** Her içerikte ortak alanlar. */
 const ortak = {
   baslik: z.string().min(2).max(60),
   ozet: z.string().min(20).max(180),
+  /** Kutu sırtındaki ad. Başlık SIRT_SINIRI'nı aşıyorsa zorunlu. */
+  sirtAdi: z.string().max(SIRT_SINIRI).optional(),
   /** Adres değişirse eskisi buraya yazılır, ziyaretçi yeni adrese yönlenir. */
   eskiAdresler: z.array(adresParcasi).default([]),
   taslak: z.boolean().default(false),
@@ -19,8 +26,6 @@ export const semalar = {
     z
       .object({
         ...ortak,
-        /** Kutu sırtına sığmayan adlar için kısa ad. */
-        sirtAdi: z.string().max(22).optional(),
         cesit: z.enum(cesitKimlikleri),
         /** Kutunun kalınlığı: 1 küçük deneme, 4 büyük proje. */
         kapsam: z.int().min(1).max(4),
@@ -47,11 +52,13 @@ export const semalar = {
           .default([]),
       })
       .strict()
-      .refine((d) => d.guncelleme >= d.baslangic, { error: 'guncelleme, baslangic tarihinden önce olamaz' }),
+      .refine((d) => d.guncelleme >= d.baslangic, { error: 'guncelleme, baslangic tarihinden önce olamaz' })
+      .refine(sirtaSigar, sirtHatasi),
   yazi: (_: SchemaContext) =>
     z
       .object({ ...ortak, tarih: z.coerce.date(), guncelleme: z.coerce.date().optional(), etiketler: z.array(z.string()).default([]) })
-      .strict(),
+      .strict()
+      .refine(sirtaSigar, sirtHatasi),
 } as const;
 
 export type TurKimligi = keyof typeof semalar;

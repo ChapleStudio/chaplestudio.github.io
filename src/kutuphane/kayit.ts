@@ -45,7 +45,7 @@ const rafBilgisi: { [T in TurKimligi]: (v: VeriTipleri[T]) => RafBilgisi } = {
     const c = cesitler[v.cesit];
     return { sirtAdi: v.sirtAdi ?? v.baslik, tarih: v.guncelleme, renk: c.renk, ikon: c.ikon, turAdi: c.ad, kapsam: v.kapsam as RafBilgisi['kapsam'] };
   },
-  yazi: (v) => ({ sirtAdi: v.baslik, tarih: v.tarih, renk: 'kagit', ikon: 'yazi', turAdi: 'Yazı', kapsam: 1 }),
+  yazi: (v) => ({ sirtAdi: v.sirtAdi ?? v.baslik, tarih: v.tarih, renk: 'kagit', ikon: 'yazi', turAdi: 'Yazı', kapsam: 1 }),
 };
 
 function kaydaCevir<T extends TurKimligi>(bolum: Bolum, tur: T, girdi: Girdi): OrtakKayit & { tur: T; veri: VeriTipleri[T] } {
@@ -67,6 +67,17 @@ export async function bolumKayitlari(bolum: Bolum): Promise<Kayit[]> {
 
 export async function tumKayitlar(): Promise<Kayit[]> {
   return (await Promise.all(acikBolumler.map(bolumKayitlari))).flat().sort(yenidenEskiye);
+}
+
+/** Kutu ölçüleri (rem). Raf.astro'daki stille aynı; `npm run denetle` taşmayı yakalar. */
+const kutuBoyu: Record<string, number> = { motor: 25, masaustu: 23, oyun: 20.5, yazi: 21.5, mobil: 18 };
+const kapsamBoyu = { 1: 1.8, 2: 2.6, 3: 3.7, 4: 4.9 } as const;
+const sirtAdimlari = [1.2, 1.5, 1.8, 2.2, 2.6, 3.1, 3.7, 4.3, 4.9] as const;
+/** İkon, yıl ve boşluklardan sonra ada kalan yer düşülür; harf eni yazı boyunun yaklaşık 0,36'sı. */
+export function sirtBoyu(k: Kayit): number {
+  const yer = (kutuBoyu[k.ikon] ?? 18) - 6;
+  const enBuyuk = Math.min(kapsamBoyu[k.kapsam], yer / (k.sirtAdi.length * 0.36));
+  return sirtAdimlari.findLast((a) => a <= enBuyuk) ?? sirtAdimlari[0];
 }
 
 const ayYil = new Intl.DateTimeFormat('tr', { month: 'long', year: 'numeric', timeZone: 'UTC' });
