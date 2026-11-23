@@ -7,7 +7,7 @@ const s = await t.newPage();
 await s.setViewport({ width: 1200, height: 630 });
 await s.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
 await s.goto('http://localhost:4322/', { waitUntil: 'load' });
-await s.evaluate(() => document.fonts.ready.then(() => { for (const s of ['header', '.araclar', '.ipucu']) document.querySelector(s)?.remove(); }));
+await s.evaluate(() => document.fonts.ready.then(() => undefined));
 await new Promise((r) => setTimeout(r, 600));
 await s.screenshot({ path: new URL('../public/paylasim.png', import.meta.url).pathname });
 await t.close();

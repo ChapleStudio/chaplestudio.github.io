@@ -1,11 +1,12 @@
 ---
 baslik: Pong
 ozet: İki kişi aynı ekranda ya da dört zorluk seviyesinde bilgisayara karşı oynanan Pong.
-sahne: pong
+kisa: "İki kişi, tek ekran"
 kategori: oyun
-alt: arcade
+sira: 5
 etiketler: [spor-oyunu, 2b, ayni-ekran, bilgisayara-karsi, unity, csharp, android]
-kapsam: 1
+afis: ../../assets/afisler/pong.jpg
+gorunum: { zemin: "#c8371f", yazi: "#fff6ea", vurgu: "#1b1512", vurguYazi: "#fff6ea", tip: bowlby, odak: 65, merkez: [68, 50] }
 baslangic: 2026-02-23
 guncelleme: 2026-03-09
 baglantilar:

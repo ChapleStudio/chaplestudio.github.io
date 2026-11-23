@@ -1,10 +1,12 @@
 ---
 baslik: Unity Online Altyapısı
 ozet: Unity 6 oyunlarına çevrimiçi eşleşme, yerel ağ ve bölünmüş ekran ekleyen hazır paket.
-sahne: eslesme
-kategori: oyun-gelistirme
+kisa: "Çok oyunculu hazır paket"
+kategori: oyun-yapimi
+sira: 2
 etiketler: [unity-paketi, cevrimici, yerel-ag, ayni-ekran, unity, fishnet, eos, csharp, bilgisayar, android]
-kapsam: 2
+afis: ../../assets/afisler/unity-online-altyapisi.jpg
+gorunum: { zemin: "#0c4a53", yazi: "#f7ecd2", vurgu: "#f0653f", vurguYazi: "#1a0d08", tip: unbounded, odak: 78, merkez: [66, 55] }
 baslangic: 2026-03-15
 guncelleme: 2026-04-12
 baglantilar:

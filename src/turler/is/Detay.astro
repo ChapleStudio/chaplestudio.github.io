@@ -1,53 +1,50 @@
 ---
 import { Image } from 'astro:assets';
 import { render } from 'astro:content';
-import Ikon from '../../bilesenler/Ikon.astro';
-import OdaGiris from '../../bilesenler/OdaGiris.astro';
-import Etiketler from '../../bilesenler/Etiketler.astro';
-import { etiketGruplari, gruptakiler, type EtiketGrubu } from '../../etiketler';
-import { ayYilYaz, isoGun, type IsKaydi } from '../../kutuphane/kayit';
+import Afis from '../../bilesenler/Afis.astro';
+import { gruptakiler } from '../../etiketler';
+import { ayYilYaz, type IsKaydi } from '../../kutuphane/kayit';
 interface Props { kayit: IsKaydi }
 const { kayit } = Astro.props;
 const v = kayit.veri;
 const { Content } = await render(kayit.girdi);
-const grupSirasi = Object.keys(etiketGruplari) as EtiketGrubu[];
-const [kapak, ...digerleri] = v.gorseller;
+const adlar = (g: Parameters<typeof gruptakiler>[1]) => gruptakiler(kayit.etiketler, g).map((e) => e.ad).join(', ');
+const [ilk, son] = [ayYilYaz(v.baslangic), ayYilYaz(v.guncelleme)];
+const bilgi = [
+  ['Türü', adlar('tur')],
+  ['Araç', adlar('arac')],
+  ['Dil', adlar('dil')],
+  ['Platform', adlar('platform')],
+  ['Lisans', v.lisans ?? ''],
+  v.suruyor ? ['Sürüyor', `${ilk} tarihinden beri`] : ['Yapıldı', ilk === son ? ilk : `${ilk} – ${son}`],
+].filter(([, d]) => d);
 ---
-<OdaGiris kayit={kayit}>
-  {v.baglantilar.length > 0 && (
-    <ul class="eylem" role="list">
-      {v.baglantilar.map((b, i) => (
-        <li><a class:list={['dugme', i === 0 && 'asil']} href={b.adres} rel="noopener"><Ikon ad={b.tur} /><span>{b.ad}{b.not && ` (${b.not})`}</span></a></li>
-      ))}
-    </ul>
-  )}
-</OdaGiris>
-<div class="sar oda-govde">
-  <dl class="kunye">
-    <div><dt>Kategori</dt><dd>{kayit.altDal ? `${kayit.dal.ad}, ${kayit.altDal.ad}` : kayit.dal.ad}</dd></div>
-    {grupSirasi.map((g) => { const e = gruptakiler(kayit.etiketler, g); return e.length > 0 && <div><dt>{etiketGruplari[g].ad}</dt><dd><Etiketler etiketler={e} /></dd></div>; })}
-    <div><dt>GitHub'da ilk kayıt</dt><dd><time datetime={isoGun(v.baslangic)}>{ayYilYaz(v.baslangic)}</time></dd></div>
-    <div><dt>Son güncelleme</dt><dd><time datetime={isoGun(v.guncelleme)}>{ayYilYaz(v.guncelleme)}</time></dd></div>
-    {v.lisans && <div><dt>Lisans</dt><dd>{v.lisans}</dd></div>}
-    {v.suruyor && <div><dt>Durum</dt><dd>Üzerinde çalışıyorum</dd></div>}
-  </dl>
-  <div>
-    {kapak && (
-      <figure>
-        <Image src={kapak.dosya} alt={kapak.alt} widths={[480, 800, 1200, 1600]} sizes="(min-width: 64rem) 58vw, 92vw" loading="lazy" />
-        {kapak.altyazi && <figcaption>{kapak.altyazi}</figcaption>}
-      </figure>
-    )}
-    <div class="yazi"><Content /></div>
-    {digerleri.length > 0 && (
-      <div class="galeri">
-        {digerleri.map((g) => (
-          <figure>
-            <Image src={g.dosya} alt={g.alt} widths={[480, 800, 1200]} sizes="(min-width: 64rem) 29vw, 92vw" />
-            {g.altyazi && <figcaption>{g.altyazi}</figcaption>}
-          </figure>
-        ))}
-      </div>
-    )}
+<div class="kafa">
+  <Afis kayit={kayit} hemen />
+  <a class="geri" href={`/#isler/${kayit.id}`} data-cik={kayit.id}><svg width="20" height="14" viewBox="0 0 20 14" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M19 7H2M8 1L2 7l6 6"></path></svg>Bütün projeler</a>
+</div>
+<div class="govde">
+  <h1 class="proje-adi">{kayit.baslik}</h1>
+  <p class="giris">{kayit.ozet}</p>
+  <div class="kunye">
+    {v.baglantilar.length > 0 && <ul class="eylem" role="list">{v.baglantilar.map((b) => <li><a href={b.adres} rel="noopener"><span>{b.ad}</span><span>{b.not ?? (b.tur === 'kaynak' ? 'GitHub' : '')}</span></a></li>)}</ul>}
+    <dl class="bilgi">{bilgi.map(([ad, deger]) => <><dt>{ad}</dt><dd>{deger}</dd></>)}</dl>
   </div>
+  <div class="yazi"><Content /></div>
+  {v.serit && (
+    <section class="serit" aria-label="Nasıl çalışıyor">
+      <Image src={v.serit.gorsel} alt={v.serit.alt} layout="none" widths={[640, 1200, 1920]} sizes="(min-width: 1260px) 1180px, 92vw" quality={84} loading="lazy" />
+      <div class="adimlar">{v.serit.adimlar.map((a) => <div><h2>{a.ad}</h2><p>{a.metin}</p></div>)}</div>
+    </section>
+  )}
+  {v.gorseller.length > 0 && (
+    <div class="galeri">
+      {v.gorseller.map((g, i) => (
+        <figure>
+          <Image src={g.dosya} alt={g.alt} layout="none" widths={[480, 800, 1200, 1600]} sizes={i === 0 ? '(min-width: 1260px) 1180px, 92vw' : '(min-width: 861px) 580px, 92vw'} loading="lazy" />
+          {g.altyazi && <figcaption>{g.altyazi}</figcaption>}
+        </figure>
+      ))}
+    </div>
+  )}
 </div>

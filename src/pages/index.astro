@@ -1,59 +1,55 @@
 ---
 import Sayfa from '../duzen/Sayfa.astro';
-import Dal from '../bilesenler/Dal.astro';
-import Ikon from '../bilesenler/Ikon.astro';
+import Afis from '../bilesenler/Afis.astro';
 import { acikBolumler, site } from '../site';
-import { gruplanmisDizin } from '../kutuphane/etiket-dizini';
-import { agacKur, yerlestir, type Dugum } from '../kutuphane/agac';
+import { kumele, tumIsler } from '../kutuphane/kayit';
+import '../stil/sahne.css';
 
-const kok = await agacKur();
-const { yerler, cizgiler } = yerlestir(kok);
-const ebeveyn: Record<string, string> = {};
-const etiketleri: Record<string, string[]> = {};
-const gez = (d: Dugum) => d.cocuklar.forEach((c) => { ebeveyn[c.id] = d.id; if (c.kayit) etiketleri[c.id] = c.kayit.etiketler.map((e) => e.id); gez(c); });
-gez(kok);
-const k = yerler.get('kok')!;
-const dallar = kok.cocuklar;
-const gruplar = await gruplanmisDizin();
+const isler = await tumIsler();
+const ilk = isler.find((k) => k.id === site.vitrin) ?? isler[0];
+if (!ilk) throw new Error('Ana sayfada gösterilecek iş yok');
+const kumeler = kumele(isler);
+/** Blog gibi iş olmayan bölümler büyük kelimelerin sonuna bağlantı olarak eklenir. */
+const digerBolumler = acikBolumler.filter((b) => b.tur !== 'is');
 ---
 <Sayfa ust={false}>
-  <header class="ust-kapsul">
-    <nav class="kapsul" aria-label="Dallar">
-      <a href="#kok" data-dal data-dugum-git="kok" aria-current="true">Hepsi</a>
-      {dallar.map((d) => <a href={`#${d.id}`} data-dal data-dugum-git={d.id} data-renk={d.renk}><Ikon ad={d.ikon} boy={18} />{d.ad}</a>)}
-    </nav>
-  </header>
-  <div class="tuval" data-tuval>
-    <canvas class="zemin" aria-hidden="true"></canvas>
-    <div class="dunya">
-      <div class="dugum kok" id="kok" data-dugum="kok" data-yer={[k.x, k.y, k.w, k.h].map(Math.round).join(' ')}>
-        <h1>{site.ad}</h1>
-        <p>{site.aciklama}</p>
+  <div class="kok" data-kok>
+    <section class="sahne" data-sahne data-is={ilk.id} aria-label="Seçili proje">
+      <div class="afisler" aria-hidden="true">
+        {isler.map((k) => <div class:list={['afis', k === ilk && 'secili']} id={`isler/${k.id}`} data-afis={k.id} data-is={k.id} hidden={k !== ilk}><Afis kayit={k} hemen={k === ilk} /></div>)}
       </div>
-      <ul role="list" aria-label="Proje ağacı">{dallar.map((d) => <Dal dugum={d} yerler={yerler} />)}</ul>
-    </div>
+      <header class="bas"><h1><a class="marka" href="/">{site.ad}</a></h1></header>
+      <div class="sozler" aria-live="polite">
+        {isler.map((k) => (
+          <div class="soz" data-soz={k.id} data-is={k.id} hidden={k !== ilk}>
+            <h2 class="proje-adi">{k.baslik}</h2>
+            <p>{k.ozet}</p>
+            <p><a class="dugme" href={k.yol} data-gir={k.id}>İçine gir<span class="gizli">: {k.baslik}</span></a></p>
+          </div>
+        ))}
+      </div>
+      {kumeler.map((c) => (
+        <div class="dilimler" data-dilimler={c.id} hidden>
+          {c.kayitlar.map((k) => <a class="dilim" href={k.yol} data-dilim={k.id} data-is={k.id}><Afis kayit={k} /><b>{k.baslik}</b></a>)}
+        </div>
+      ))}
+    </section>
+    <section class="plaka" data-plaka aria-label="Bütün projeler">
+      <div class="raf">
+        {kumeler.map((c) => (
+          <div class:list={['grup', c.id === ilk.kume.id && 'acik']} data-grup={c.id}>
+            <h2><button type="button" data-kategori={c.id} aria-expanded="false">{c.ad}</button></h2>
+            <ul class="liste" role="list">
+              {c.kayitlar.map((k) => <li><a class="ad" href={k.yol} data-sec={k.id} aria-current={k === ilk ? 'true' : undefined}><span>{k.baslik}</span><i>{k.veri.kisa}</i></a></li>)}
+            </ul>
+          </div>
+        ))}
+        {digerBolumler.map((b) => <div class="grup"><h2><a href={`/${b.id}/`}>{b.ad}</a></h2></div>)}
+      </div>
+    </section>
   </div>
-  <p class="ipucu" aria-hidden="true">Bir dala ya da projeye tıkla</p>
-  <div class="araclar">
-    <div class="kapsul" role="group" aria-label="Görünüm">
-      <button type="button" data-etiket-ac aria-expanded="false" aria-controls="etiket-paneli"><Ikon ad="etiket" /><span>Etiketler</span></button>
-      {acikBolumler.map((b) => <a href={`/${b.id}/`}><Ikon ad="ara" /><span>{acikBolumler.length > 1 ? b.ad : 'Liste'}</span></a>)}
-    </div>
-  </div>
-  <div class="suzgec-durumu" data-suzgec-durumu hidden></div>
-  <aside class="etiket-paneli" id="etiket-paneli" aria-label="Etiketle süz" hidden>
-    <header><h2>Etiketler</h2><div><button type="button" data-etiket-temizle hidden>Temizle</button><button type="button" data-etiket-kapat><Ikon ad="kapat" /><span class="gizli">Kapat</span></button></div></header>
-    <p role="status" data-etiket-sonuc>Birkaçını seç, hepsini taşıyan projeler kalsın.</p>
-    {gruplar.map((g) => (
-      <section>
-        <h3>{g.ad}</h3>
-        <ul class="etiketler" role="list">{g.satirlar.map((s) => <li><button type="button" class="etiket" aria-pressed="false" data-etiket-sec={s.etiket.id}>{s.etiket.ad}<span class="adet">{s.kayitlar.length}</span></button></li>)}</ul>
-      </section>
-    ))}
-  </aside>
-  <script type="application/json" id="agac" is:inline set:html={JSON.stringify({ cizgiler, ebeveyn, etiketleri }).replaceAll('<', '\\u003c')} />
-  <div class="oda-kabi" hidden slot="son" data-oda-kabi></div>
+  <script is:inline src="/ilk.js" slot="bas"></script>
 </Sayfa>
 <script>
-  import '../tuval/tuval';
+  import '../sahne/sahne';
 </script>

@@ -1,8 +1,0 @@
----
-/* Sahne perdesi: iki yanda ağır kumaş kıvrımları. */
-const kivrim = [0, 1, 2, 3, 4];
----
-<svg class="perde-sus" viewBox="0 0 1440 900" preserveAspectRatio="none" aria-hidden="true">
-  {kivrim.map((i) => <path d={`M${i * 34} 0 C${i * 34 + 46} 260 ${i * 30 - 6} 560 ${i * 18 + 20} 900 L${i * 18 - 40} 900 L${i * 34 - 60} 0Z`} fill={['#2b1750', '#3a2069', '#321a5c', '#45277b', '#2b1750'][i]} />)}
-  {kivrim.map((i) => <path d={`M${1440 - i * 34} 0 C${1394 - i * 34} 260 ${1446 - i * 30} 560 ${1420 - i * 18} 900 L${1480 - i * 18} 900 L${1500 - i * 34} 0Z`} fill={['#2b1750', '#3a2069', '#321a5c', '#45277b', '#2b1750'][i]} />)}
-</svg>

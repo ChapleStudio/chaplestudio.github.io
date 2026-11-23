@@ -2,35 +2,35 @@
 import type { GetStaticPaths } from 'astro';
 import { getImage } from 'astro:assets';
 import Sayfa from '../../duzen/Sayfa.astro';
-import Kart from '../../bilesenler/Kart.astro';
+import Afis from '../../bilesenler/Afis.astro';
 import IsDetay from '../../turler/is/Detay.astro';
 import YaziDetay from '../../turler/yazi/Detay.astro';
 import { acikBolumler } from '../../site';
-import { bolumKayitlari } from '../../kutuphane/kayit';
+import { bolumKayitlari, isMi } from '../../kutuphane/kayit';
+import '../../stil/oda.css';
 export const getStaticPaths = (async () => {
   const bolumler = await Promise.all(acikBolumler.map(bolumKayitlari));
   return bolumler.flatMap((kayitlar) =>
     kayitlar.filter((kayit) => !kayit.kendiSitesi).map((kayit) => ({
       params: { bolum: kayit.bolum.id, id: kayit.id },
-      props: { kayit, komsular: kayitlar.filter((k) => k.dal.id === kayit.dal.id && k.id !== kayit.id).slice(0, 4) },
+      props: { kayit, komsular: kayitlar.filter(isMi).filter((k) => k.kume.id === kayit.kume.id && k.id !== kayit.id).slice(0, 4) },
     })),
   );
 }) satisfies GetStaticPaths;
 const { kayit, komsular } = Astro.props;
-const kapak = kayit.tur === 'is' ? kayit.veri.gorseller[0] : undefined;
-const gorsel = kapak && (await getImage({ src: kapak.dosya, width: 1200, format: 'jpeg', layout: 'none' })).src;
+const is = kayit.tur === 'is' ? { id: kayit.id, renk: kayit.veri.gorunum.zemin } : undefined;
+const gorsel = kayit.tur === 'is' ? (await getImage({ src: kayit.veri.afis, width: 1200, format: 'jpeg', layout: 'none' })).src : undefined;
 ---
-<Sayfa tema={kayit.tema} baslik={kayit.baslik} aciklama={kayit.ozet} tur="article" ust={false} {...gorsel ? { gorsel } : {}}>
-  <article class="oda" data-renk={kayit.dal.renk} data-tema={kayit.tema}>
-    {kayit.tur === 'is' ? <IsDetay kayit={kayit} /> : <YaziDetay kayit={kayit} />}
-    {komsular.length > 0 && (
-      <section class="sar komsular" aria-labelledby="komsu">
-        <h2 id="komsu">Aynı daldan</h2>
-        <ul role="list">{komsular.map((k) => <li><Kart kayit={k} /></li>)}</ul>
-      </section>
-    )}
-  </article>
+<Sayfa baslik={kayit.baslik} aciklama={kayit.ozet} tur="article" is={is} ust={kayit.tur !== 'is'} {...gorsel ? { gorsel } : {}}>
+  <article>{kayit.tur === 'is' ? <IsDetay kayit={kayit} /> : <YaziDetay kayit={kayit} />}</article>
+  {komsular.length > 0 && (
+    <section class="komsular" aria-labelledby="komsu">
+      <h2 id="komsu">{kayit.kume.ad}</h2>
+      <ul role="list">{komsular.map((k) => <li data-is={k.id}><a href={k.yol}><Afis kayit={k} /><b>{k.baslik}</b></a></li>)}</ul>
+      <p><a href={`/${kayit.bolum.id}/`}>{kayit.bolum.ad} listesi ve arama</a></p>
+    </section>
+  )}
 </Sayfa>
 <script>
-  import '../../tuval/sahnelik';
+  import '../../sahne/oda';
 </script>

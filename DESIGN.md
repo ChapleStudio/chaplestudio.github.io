@@ -2,42 +2,32 @@
 
 ## Fikir
 
-Site toprağın altına inen **kökler**: Chaple Studio yüzeyde, kategoriler kalın kökler, projeler köklerin ucundaki dünyalar. Her dal yukarıdan aşağı iner; içerik büyüdükçe kökler uzar. Yerleşim `src/kutuphane/agac.ts` içinde hesaplanır. Elle yakınlaştırma yoktur; tekerlek dikey kaydırır, dala tıklayınca kamera ona uçar, projenin içine girilir.
+**Stüdyo susar, iş konuşur.** Arayüz beyaz ve sessizdir; bütün renk ve karakter projelerden gelir. Her projenin kendi afişi, kendi renkleri ve kendi yazı tipi vardır. Ana sayfanın üstü seçili projenin sahnesidir, altında dört kategori durur.
 
-**Stüdyo tek kalıp dayatmaz.** Her proje kendi temasını taşıyabilir: düğümü ağaçta o temayla görünür, içine girince bütün sayfa onun dünyasıdır.
+## Gezinme
 
-## Stüdyonun rengi
+- Kategori → dilimler → proje → içine girme. Kategoriye basınca sahne o kategorinin afişlerine bölünür, basılan dilim ekranı kaplar, "İçine gir" afişe yakınlaşıp sayfayı açar.
+- **Her şey tıklamayla olur.** Üstüne gelmek hiçbir şeyi açmaz ya da değiştirmez.
+- Teknoloji etiketi (Unity, C#…) gezinmede yoktur, proje sayfasının künyesinde durur.
+- Adın altındaki iki üç kelime projenin ne yaptığını söyler. Adlar ve açıklamalar tek satır, aynı çizgidedir.
 
-Gece toprağı: mürdüm zemin `#1d1218`, toprak `#24161c`, kemik yazı `#f2e6da`. Kök boyaları: mercan (Oyunlar), altın (Oyun geliştirme), leylak (Yapay zekâ), adaçayı (Sistem ve donanım), gök (Kişiselleştirme), bakır (Bildirim araçları). Listede olmayan renk yalnız bir temanın içinde kullanılır.
+## Afişler
 
-## Yazı
+Kesme kâğıt tarzı: düz renkler, elle kesilmiş gibi kenar, hafif kâğıt dokusu. Konu sağda; sol yarı sakin, çünkü üstüne ad gelir. 1920×900. Soyut ya da mekanik değil, **karakterli ve küçük bir hikâyesi olan** çizim: kardan adam, tavşan, kuşlar. Ekran görüntüsü afişe konmaz, proje sayfasında durur; görsel uydurulmaz. Kaynak: `araclar/afis-ciz.py`.
 
-Başlık Grenze 600-700 (el kesimi, oyun kutusu havası), metin Alegreya Sans 400/500/700. Temalar kendi yazısını getirir: Rowl'da Piazzolla, Fairy of Light'ta Grandstander.
+## Renk ve yazı
 
-## Biçim
+Stüdyo: beyaz `#ffffff`, siyah `#111111`, seçili olmayan kategori `#757575`, açıklama `#595959`. Arayüz yazısı Hanken Grotesk. Proje renkleri içerikteki `gorunum` alanındadır; karşıtlık 4,5'in altındaysa derleme durur. Proje adının yazı tipleri `src/temalar/tipler.ts` içindedir.
 
-- Köşeler eşit değil, elle kesilmiş gibi (`--kose`). Hap biçimi, cam, parlama, renk lekesi, süzülen toz, noktalı ızgara yok.
-- Kökler kalınlığı azalan, kıvrımlı şekillerdir; çizgi değildir.
-- Etiketler sol ucu kesik bez etiket biçimindedir.
-- Düğümlerde ne yaptığını anlatan küçük canlı sahne oynar; gerçek ekran görüntüleri proje sayfasındadır.
-
-## Temalar
-
-| Tema | Proje | Dünya |
-|---|---|---|
-| studyo | varsayılan | Gece toprağı |
-| rowl | Rowl Engine | Mor perde, sahne ve görsel roman konuşma kutusu |
-| peri | Fairy of Light | Alacakaranlık ormanı, ışık yalnız periden gelir |
+Parlama, renk lekesi, nokta ızgara, süzülen toz, hap biçimi ve aynı kalıptan kartlar yoktur.
 
 ## Hareket
 
-- Açılışta kökler aşağı doğru büyür, bir kez.
-- Köklerin içinde özsu ağır ağır iner; seçilen dal kendi rengine boyanır, ötekiler kararır.
-- Kamera yolu yakınlaşmayı ve kaydırmayı birlikte yapar (van Wijk).
-- Girişte düğümün sahnesi ekranı kaplar, çıkışta aynı yoldan geri döner.
+- Afiş geçişi soldan sağa silinir (önce ad okunur), dilimler yukarıdan iner, kapanış da animasyonludur.
+- Animasyonlar `Element.animate` ile başlatılır; her tıklamada baştan oynar, durum farkına bağlı değildir.
+- Sürekli çizim döngüsü yoktur; kimse dokunmuyorsa hiçbir şey çalışmaz.
 - `prefers-reduced-motion` hepsini kapatır.
-- Enerji: bütün döngüler `src/tuval/tempo.ts` üzerinden zamanlanır. Etkileşimde 60, boşta 12 kare/sn; 25 saniye dokunulmazsa, pencere arkadaysa ya da gizliyse hiç çizilmez. Yeni efekt kendi `requestAnimationFrame` döngüsünü açmaz.
 
 ## Erişim
 
-Ağaç gerçek bir bağlantı listesidir. Telefonda kök ve kategoriler tek ekrandadır, dokunulan dal açılır. JavaScript yoksa bütün dallar açık akar. Ok tuşları düğümler arasında gezer, Esc bir kat çıkar, her projenin kendi adresi vardır.
+Her ad gerçek bir bağlantıdır: orta tuş ve Ctrl ile yeni sekmede açılır. JavaScript yoksa bütün kategoriler açık listelenir. Esc dilimleri kapatır, proje sayfasından çıkar.

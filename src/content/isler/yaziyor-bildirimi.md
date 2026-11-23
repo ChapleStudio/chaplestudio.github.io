@@ -1,10 +1,12 @@
 ---
 baslik: Yazıyor Bildirimi
 ozet: WhatsApp'ta biri yazmaya başlayınca bildirim gönderen Chrome eklentisi ve Android uygulaması.
-sahne: yaziyor
-kategori: bildirim
+kisa: "Kim yazıyor, haber verir"
+kategori: arac
+sira: 5
 etiketler: [tarayici-eklentisi, mobil-uygulama, whatsapp, erisilebilirlik, javascript, java, chrome, android]
-kapsam: 1
+afis: ../../assets/afisler/yaziyor-bildirimi.jpg
+gorunum: { zemin: "#1b6b5e", yazi: "#f0fbf5", vurgu: "#f3c83c", vurguYazi: "#12211f", tip: grandstander, odak: 77, merkez: [66, 45] }
 baslangic: 2026-04-12
 guncelleme: 2026-04-12
 baglantilar:

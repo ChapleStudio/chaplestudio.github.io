@@ -2,11 +2,11 @@
 import Sayfa from '../duzen/Sayfa.astro';
 import { acikBolumler } from '../site';
 ---
-<Sayfa baslik="Bu dal kurumuş" dizinleme={false}>
+<Sayfa baslik="Sayfa bulunamadı" dizinleme={false}>
   <div class="sar sayfa-ic">
-    <h1>Bu dal kurumuş</h1>
+    <h1>Bu sayfa yok</h1>
     <p>Adres yanlış olabilir ya da iş taşınmış olabilir.</p>
-    <p><a class="dugme" href="/">Ağaca dön</a></p>
+    <p><a class="dugme" href="/">Ana sayfaya dön</a></p>
     <ul>{acikBolumler.map((b) => <li><a href={`/${b.id}/`}>{b.ad}</a></li>)}</ul>
   </div>
 </Sayfa>

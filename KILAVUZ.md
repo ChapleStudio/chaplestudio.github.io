@@ -2,31 +2,33 @@
 
 ## Yeni iş eklemek
 
+1. Afişi hazırla: 1920×900, konu sağda, sol yarı sakin. `src/assets/afisler/<ad>.jpg`.
+2. Dosyayı oluştur:
+
 ```bash
 npm run yeni -- isler "Oyunumun Adı"
 ```
 
-`src/content/isler/` içinde hazır bir dosya oluşur. Doldur, `taslak: true` satırını sil. Ekran görüntülerini `src/assets/isler/<ad>/` klasörüne koy. Düğümü ağaçta kendiliğinden yerini alır; liste, süzgeç, RSS ve site haritası kendiliğinden güncellenir.
+3. `src/content/isler/` içindeki dosyayı doldur, `taslak: true` satırını sil. Ekran görüntüleri `src/assets/isler/<ad>/` klasörüne.
+
+Ana sayfa, liste, RSS ve site haritası kendiliğinden güncellenir. Eksik ya da okunmayan bir şey derlemeyi durdurur.
+
+## Projenin görünümü
+
+İçerikteki `gorunum` alanı:
+
+- `zemin`, `yazi`, `vurgu`, `vurguYazi`: dört renk (`#rrggbb`). Karşıtlık denetlenir.
+- `tip`: adın yazı tipi, `src/temalar/tipler.ts` listesinden. `boy` ve `en` uzun adlarda küçültmek ya da iki satıra kırmak için.
+- `odak`: dar dilimde afişin hangi parçası görünsün (0 sol, 100 sağ). `merkez`: içine girerken yakınlaşılan nokta. `kafa`: proje sayfasının üstündeki dikey yer.
+
+`kisa` adın altındaki iki üç kelimedir. `sira` kategorideki yeridir; verilmeyen en sona, yeniden eskiye dizilir. `serit` sayfanın ortasına geniş çizim ve adımlar koyar (örnek: Rowl Engine). Açılışta görünen iş `src/site.ts` içindeki `vitrin`dir.
+
+**Kendi sitesi olan proje:** hazır siteyi `public/<yol>/` klasörüne koy, içeriğe `kendiSitesi: /<yol>/` yaz. İçine girilince o site açılır. O sitede dönüş için `/#isler/<dosya-adı>` bağlantısı yeter.
 
 ## Kategori ve etiket
 
-- **Kategori işin ne olduğunu söyler** ve ağacın dalıdır: `src/turler/is/kategoriler.ts`. Yeni kategori buraya bir satır; dal, renk ve menü kendiliğinden gelir. `altlar` alt dallardır.
-- **Etiket neyle, nerede, nasıl olduğunu söyler**: `src/etiketler.ts`. Beş grup var: türü, özellikleri, yapıldığı araç, yazılım dili, platform. Her işte en az bir tür, bir dil ve bir platform etiketi zorunlu. Sözlükte olmayan etiket derlemeyi durdurur.
-- Etiket eklenince sayfası (`/etiket/<ad>/`), ağaçtaki süzgeci ve liste süzgeci kendiliğinden oluşur.
-
-## Projeye kendi temasını vermek
-
-Üç seviye var, hepsi `src/temalar/tema.ts` içinde anlatılı:
-
-1. **Renk, yazı, çerçeve:** `temaKimlikleri` listesine adı ekle, `src/temalar/kartlar.css`'e düğüm rengini, `src/temalar/<ad>/oda.css`'e sayfanın stilini yaz. Sayfa yalnız kendi temasının dosyasını indirir.
-2. **Özel sahne:** `src/temalar/<ad>/Sus.astro` yaz, `src/bilesenler/OdaGiris.astro` içinde temaya bağla.
-3. **Kendi sitesi:** Hazır siteyi `public/<yol>/` klasörüne koy, içeriğe `kendiSitesi: /<yol>/` yaz. Düğüm ağaçta durur, içine girilince o site açılır; tasarımına dokunulmaz. O sitede dönüş için `/#isler/<dosya-adı>` bağlantısı yeter.
-
-İçerikte `tema: <ad>` yazmak yeterli. Erişilebilirlik denetimi bütün temalarda çalışır.
-
-## Düğümün canlı sahnesi
-
-`sahne:` alanına `src/tuval/sahne-kimlikleri.ts` içindeki adlardan birini yaz. Boş bırakırsan ada özgü bir desen çizilir. Yeni sahne için adı oraya, çizimi `src/tuval/sahneler.ts` içine ekle.
+- **Kategori işin ne olduğunu söyler**: `src/turler/is/kategoriler.ts`. Yeni kategori bir satır; ana sayfadaki büyük kelime kendiliğinden gelir.
+- **Etiket neyle, nerede çalıştığını söyler**: `src/etiketler.ts`. Her işte en az bir tür, bir dil ve bir platform etiketi zorunlu. Künyede ve `/isler/` aramasında kullanılır.
 
 ## Yeni bölüm açmak (blog gibi)
 
@@ -39,7 +41,7 @@ npm run yeni -- gunluk "İlk yazım"
 ## Yeni içerik türü (müzik, çizim…)
 
 1. `src/turler/semalar.ts`: alanları tanımla.
-2. `src/kutuphane/kayit.ts`: `VeriTipleri` ve `dugumBilgisi`ne ekle (hangi dala asılacağı, rengi, ikonu).
+2. `src/kutuphane/kayit.ts`: `VeriTipleri` ve `tureOzel`e ekle (kümesi, sırası, tarihi).
 3. `src/turler/<tür>/Liste.astro` ve `Detay.astro`; `src/pages/[bolum]/` içindeki iki dosyada çağır.
 
 Eksik bırakılan adımı tip denetimi söyler.
@@ -54,7 +56,7 @@ Eksik bırakılan adımı tip denetimi söyler.
 npm run denetle
 ```
 
-Tip, şema, kırık bağlantı, taşma, erişilebilirlik, güvenlik ilkesi ve süzgeci gerçek Chrome'da dener. `main` dalına gönderilen her değişiklik GitHub'da aynı denetimden geçer, geçerse chaplestudio.github.io yayınlanır. Yedek adres:
+Tip, şema, kırık bağlantı, taşma, hizalama, erişilebilirlik, güvenlik ilkesi, arama ve her tıklamada animasyonun oynadığını gerçek Chrome'da dener. `main` dalına gönderilen her değişiklik GitHub'da aynı denetimden geçer, geçerse chaplestudio.github.io yayınlanır. Yedek adres:
 
 ```bash
 npm run yayinla:cloudflare

@@ -1,32 +1,31 @@
 ---
-import baslikYazi from '@fontsource-variable/grenze/files/grenze-latin-wght-normal.woff2?url';
-import metinYazi from '@fontsource/alegreya-sans/files/alegreya-sans-latin-400-normal.woff2?url';
-import metinEk from '@fontsource/alegreya-sans/files/alegreya-sans-latin-ext-400-normal.woff2?url';
+import metinYazi from '@fontsource-variable/hanken-grotesk/files/hanken-grotesk-latin-wght-normal.woff2?url';
+import metinEk from '@fontsource-variable/hanken-grotesk/files/hanken-grotesk-latin-ext-wght-normal.woff2?url';
+import '../stil/yazilar.css';
 import '../stil/temel.css';
-import '../stil/tuval.css';
-import '../temalar/kartlar.css';
-import { temaStili, type Tema } from '../temalar/tema';
 import { acikBolumler, site } from '../site';
+import { projeStiliAdresi } from '../temalar/proje-stili';
 
-interface Props { baslik?: string; aciklama?: string; gorsel?: string; tur?: 'website' | 'article'; dizinleme?: boolean; ust?: boolean; tema?: Tema }
-const { baslik, aciklama = site.aciklama, gorsel = '/paylasim.png', tur = 'website', dizinleme = true, ust = true, tema = 'studyo' } = Astro.props;
+interface Props { baslik?: string; aciklama?: string; gorsel?: string; tur?: 'website' | 'article'; dizinleme?: boolean; ust?: boolean; is?: { id: string; renk: string } | undefined }
+const { baslik, aciklama = site.aciklama, gorsel = '/paylasim.png', tur = 'website', dizinleme = true, ust = true, is } = Astro.props;
 const tamBaslik = baslik ? `${baslik} | ${site.ad}` : site.ad;
 const asil = new URL(Astro.url.pathname, Astro.site).href;
 const yol = Astro.url.pathname;
 ---
 <!doctype html>
-<html lang={site.dil}>
+<html lang={site.dil} data-is={is?.id}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{tamBaslik}</title>
     <meta name="description" content={aciklama} />
     {dizinleme ? <link rel="canonical" href={asil} /> : <meta name="robots" content="noindex" />}
-    {[baslikYazi, metinYazi, metinEk].map((y) => <link rel="preload" href={y} as="font" type="font/woff2" crossorigin />)}
+    {[metinYazi, metinEk].map((y) => <link rel="preload" href={y} as="font" type="font/woff2" crossorigin />)}
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="alternate" type="application/rss+xml" title={site.ad} href="/rss.xml" />
     <link rel="sitemap" href="/sitemap-index.xml" />
-    <meta name="theme-color" content="#1d1218" />
+    <link rel="stylesheet" href={await projeStiliAdresi()} />
+    <meta name="theme-color" content={is?.renk ?? '#ffffff'} />
     <meta property="og:site_name" content={site.ad} />
     <meta property="og:type" content={tur} />
     <meta property="og:locale" content="tr_TR" />
@@ -35,21 +34,18 @@ const yol = Astro.url.pathname;
     <meta property="og:url" content={asil} />
     <meta property="og:image" content={new URL(gorsel, Astro.site).href} />
     <meta name="twitter:card" content="summary_large_image" />
-    {temaStili(tema) && <link rel="stylesheet" href={temaStili(tema)} data-tema-stili />}
     <slot name="bas" />
   </head>
   <body>
     <a class="atla" href="#icerik">İçeriğe geç</a>
     {ust && (
-      <header class="ust-kapsul">
-        <nav class="kapsul" aria-label="Site">
-          <a href="/">{site.ad}</a>
+      <header class="ust sar">
+        <a class="marka" href="/">{site.ad}</a>
+        <nav aria-label="Site">
           {acikBolumler.map((b) => <a href={`/${b.id}/`} aria-current={yol === `/${b.id}/` ? 'page' : undefined}>{b.ad}</a>)}
-          <a href="/etiket/" aria-current={yol === '/etiket/' ? 'page' : undefined}>Etiketler</a>
         </nav>
       </header>
     )}
     <main id="icerik" tabindex="-1"><slot /></main>
-    <slot name="son" />
   </body>
 </html>

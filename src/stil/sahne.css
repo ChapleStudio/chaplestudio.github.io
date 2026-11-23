@@ -1,0 +1,77 @@
+/* Ana sayfa: üstte seçili projenin afişi, altta kategoriler. Davranış: src/sahne/sahne.ts */
+.kok { position: relative; display: flex; flex-direction: column; height: 100svh; min-height: 640px; overflow: hidden; background: #fff; color: #111; }
+.sahne { position: relative; flex: 1 1 auto; min-height: 420px; overflow: hidden; background: var(--zemin); color: var(--yazi); transition: background-color 0.6s, color 0.3s; }
+.afisler { position: absolute; inset: 0; }
+.afis { position: absolute; inset: 0; overflow: hidden; background: var(--zemin); transform-origin: var(--merkez); z-index: 0; visibility: hidden; }
+.afis.onceki { z-index: 1; visibility: visible; }
+.afis.secili { z-index: 2; visibility: visible; transition: transform 0.7s cubic-bezier(0.6, 0, 0.2, 1); }
+.afis img { width: 100%; height: 100%; object-fit: cover; object-position: 100% 50%; }
+.bas { position: absolute; z-index: 3; top: 0; left: var(--kenar); min-height: 5.25rem; display: flex; align-items: center; }
+.bas h1 { font-size: inherit; letter-spacing: inherit; }
+.marka { display: inline-flex; align-items: center; min-height: 2.75rem; }
+.sozler { position: absolute; z-index: 3; left: var(--kenar); right: var(--kenar); bottom: 3.25rem; max-width: 620px; transition: opacity 0.3s 0.4s, transform 0.5s; }
+.soz { display: flex; flex-direction: column; gap: 1.125rem; }
+.soz p { font-size: 1.3125rem; line-height: 1.42; font-weight: 500; max-width: 470px; }
+.soz p + p { padding-top: 0.5rem; }
+
+.dilimler { position: absolute; inset: 0; z-index: 4; display: flex; }
+.dilim { position: relative; flex: 1 1 0; min-width: 0; overflow: hidden; background: var(--zemin); color: var(--yazi); text-decoration: none; transition: flex-grow 0.55s var(--egri), height 0.55s var(--egri); }
+.dilim img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: var(--odak) 50%; }
+.dilim b { position: absolute; left: 0; right: 0; bottom: 0; display: flex; align-items: center; min-height: 104px; padding: 14px 22px; background: var(--zemin); font: var(--kalin) 1.875rem/1.02 var(--tip), var(--metin); overflow-wrap: anywhere; transition: opacity 0.25s; }
+.dilim:hover b { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.15em; }
+.dilim:focus-visible { outline-offset: -6px; }
+.dilimler[data-buyu] b { opacity: 0; }
+.dilim.kucuk { flex-grow: 0.0001; }
+
+.plaka { position: relative; z-index: 4; flex: none; padding: 18px var(--kenar) 20px; background: #fff; transition: transform 0.6s cubic-bezier(0.6, 0, 0.2, 1), margin 0.6s cubic-bezier(0.6, 0, 0.2, 1); }
+.raf { display: flex; flex-wrap: wrap; gap: 0 44px; }
+.grup { display: contents; }
+.grup h2 { font-size: 2.125rem; line-height: 1; }
+.grup h2 > * { display: flex; align-items: center; min-height: 56px; font-weight: 800; color: var(--sonuk); text-decoration: none; transition: color 0.2s; letter-spacing: inherit; }
+.grup h2 > *:hover, .grup.acik h2 > * { color: #111; }
+.liste { display: flex; order: 1; flex: 0 0 100%; flex-wrap: wrap; align-items: flex-start; gap: 4px clamp(28px, 3.6vw, 60px); padding-top: 6px; }
+.ad { display: flex; flex-direction: column; gap: 3px; min-height: 64px; padding-top: 8px; font-size: 1.1875rem; line-height: 1.2; font-weight: 700; white-space: nowrap; text-decoration: none; }
+.ad span { align-self: flex-start; border-bottom: 3px solid transparent; }
+.ad i { font-style: normal; font-size: 1rem; font-weight: 400; color: var(--soluk); }
+.ad[aria-current] span, .ad:hover span { border-color: #111; }
+/* Betik çalışıyorsa yalnız seçili kategorinin işleri görünür; çalışmıyorsa hepsi. */
+@media (scripting: enabled) and (min-width: 861px) { .grup:not(.acik) .liste { display: none; } }
+
+/* İçine girerken: afiş yakınlaşır, yazı ve alt şerit çekilir. */
+.kok[data-giriyor] .afis.secili { transform: scale(1.9); }
+.kok[data-giriyor] .sozler { opacity: 0; transform: translateX(-60px); transition: opacity 0.2s, transform 0.5s; }
+.kok[data-giriyor] .plaka { transform: translateY(100%); margin-top: calc(var(--plaka-boy, 170px) * -1); }
+.kok[data-ani] * { transition: none !important; }
+.bekle .afisler, .bekle .sozler { visibility: hidden; }
+.bekle .afis { visibility: hidden !important; }
+
+/* Kısa pencere: ad ve açıklama küçülür, üstteki adla çakışmaz. */
+@media (max-height: 760px) and (min-width: 861px) {
+  .sahne { --tavan: 14svh; }
+  .sozler { bottom: 1.75rem; }
+  .soz { gap: 0.75rem; }
+  .soz p { font-size: 1.125rem; }
+}
+@media (max-width: 860px) {
+  .kok { height: auto; min-height: 100svh; overflow: visible; }
+  .sahne { flex: none; min-height: 0; display: flex; flex-direction: column; }
+  .bas { position: relative; left: 0; order: -1; min-height: 60px; padding-inline: 1.25rem; }
+  .afisler { position: relative; inset: auto; width: 100%; aspect-ratio: 4 / 3; overflow: hidden; }
+  .afis img { object-position: 82% 50%; }
+  .sahne { --tavan: 100svh; }
+  .sozler { position: relative; inset: auto; padding: 1.5rem 1.25rem 2rem; max-width: none; }
+  .soz p { font-size: 1.1875rem; max-width: none; }
+  .dilimler { position: relative; inset: auto; flex-direction: column; }
+  .dilim { flex: none; height: 150px; }
+  .dilim b { min-height: 60px; font-size: 1.6rem; }
+  .dilim.buyuk { height: 300px; }
+  .dilim.kucuk { height: 0; }
+  .sahne[data-kat] .afisler, .sahne[data-kat] .sozler { display: none; }
+  .plaka { padding: 20px 1.25rem; }
+  .raf { display: block; }
+  .grup { display: block; padding-bottom: 26px; }
+  .grup h2 { font-size: 1.875rem; }
+  .grup h2 > * { color: #111; }
+  .liste { display: block; padding-top: 0; }
+  .ad { min-height: 60px; white-space: normal; }
+}

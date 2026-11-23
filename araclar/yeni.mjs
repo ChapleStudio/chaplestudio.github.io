@@ -21,10 +21,11 @@ const sablon = {
   is: `---
 baslik: ${tirnak}
 ozet: Ne yaptığını bir cümleyle yaz, en az 20 karakter.
-kategori: oyun # oyun | oyun-gelistirme | yapay-zeka | sistem | kisisellestirme | bildirim
-alt: arcade # yalnız oyun için: cok-oyunculu | arcade
+kisa: Ne yapıyor, iki üç kelime
+kategori: oyun # oyun | oyun-yapimi | yapay-zeka | arac
 etiketler: [sonsuz-kosu, unity, csharp, android] # src/etiketler.ts
-kapsam: 1 # 1 küçük deneme, 4 büyük proje (geniş düğüm)
+afis: ../../assets/afisler/${sade}.jpg # 1920×900, konu sağda, sol yarı sakin
+gorunum: { zemin: "#1f6b48", yazi: "#f7eed9", vurgu: "#f2b632", vurguYazi: "#10211a", tip: hanken } # tipler: src/temalar/tipler.ts
 baslangic: ${bugun}
 guncelleme: ${bugun}
 suruyor: true

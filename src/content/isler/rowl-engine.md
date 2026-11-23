@@ -1,40 +1,35 @@
 ---
 baslik: Rowl Engine
 ozet: Kod bilmeden görsel roman yapmak için oyun motoru ve düğüm tabanlı hikâye editörü.
-sahne: hikaye
-tema: rowl
-arka: ../../assets/isler/rowl-engine/scene-earthquake.jpg
-kategori: oyun-gelistirme
+kisa: "Görsel roman motoru"
+kategori: oyun-yapimi
+sira: 1
 etiketler: [oyun-motoru, gorsel-roman, dugum-editoru, kodsuz, sdl3, avalonia, cpp, csharp, lua, linux, windows, android]
-kapsam: 4
+afis: ../../assets/afisler/rowl-engine.jpg
+gorunum: { zemin: "#2b1550", yazi: "#f1e9ff", vurgu: "#f0b441", vurguYazi: "#2b1550", tip: rakkas, odak: 97, merkez: [70, 50], kafa: 100 }
 baslangic: 2026-07-29
 guncelleme: 2026-11-11
 suruyor: true
 lisans: MIT
 baglantilar:
   - { tur: kaynak, ad: Kaynak kodu, adres: https://github.com/omerseyfettinozd/Rowl-Engine }
+serit:
+  gorsel: ../../assets/afisler/rowl-agac.jpg
+  alt: "Bir kapıyla başlayan, dallanıp üç ayrı sona varan hikâye çizimi"
+  adimlar:
+    - { ad: Kur, metin: "Her düğüm bir sahne: ekranda kim var, ne söylüyor, hangi müzik çalıyor." }
+    - { ad: Dallandır, metin: "Seçimler, değişkenler ve koşullar hikâyeyi farklı sonlara götürür." }
+    - { ad: Oyunu çıkar, metin: "Editör olmadan çalışan bağımsız bir oyun olarak dışa aktarılır." }
 gorseller:
   - dosya: ../../assets/isler/rowl-engine/editor.png
-    alt: "Rowl Engine editörü: ortada dallanan hikâye grafiği, sağda denetçi ve canlı sahne önizlemesi"
-    altyazi: Editörde birlikte gelen "Kayıp Tablo" demosu
-  - dosya: ../../assets/isler/rowl-engine/scene-leyla.jpg
-    alt: "Kayıp Tablo demosunda çinili odasında Leyla ve oyuncuya sunulan üç seçenek"
-    altyazi: Seçimler Leyla'nın sana güvenip güvenmeyeceğini belirler
-  - dosya: ../../assets/isler/rowl-engine/scene-earthquake.jpg
-    alt: "Kayıp Tablo demosunda Ayasofya önünde deprem sahnesi"
-    altyazi: 10 Temmuz 1894, öğle
-  - dosya: ../../assets/isler/rowl-engine/android-workshop.jpg
-    alt: "Aynı demo Android telefonda: atölyesinde Usta Agop konuşuyor"
-    altyazi: Aynı demo, gerçek bir Android telefonda
+    alt: "Rowl Engine editörü: ortada dallanan hikâye grafiği, sağda denetçi"
+    altyazi: Editörün kendisi
 ---
 
-Rowl Engine, oyuncunun seçimleriyle yön değiştiren hikâye oyunları için. Hikâye, tuvalde düğümler birbirine bağlanarak kurulur. Her düğüm bir sahnedir: ekranda kim var, ne söylüyor, hangi müzik çalıyor, hangi seçenekler çıkıyor.
-
-Oyun bitince editör olmadan çalışan bağımsız bir oyun olarak dışa aktarılır. Hazır düğümlerin yapamadığı şeyler Lua betikleriyle eklenir.
+Rowl Engine, oyuncunun seçimleriyle yön değiştiren hikâye oyunları için. Hikâye, tuvalde düğümler birbirine bağlanarak kurulur. Hazır düğümlerin yapamadığı şeyler Lua betikleriyle eklenir.
 
 ## Neler var
 
-- Dallanan seçimler, değişkenler, koşullar ve birden fazla son
 - Oyunu derlemeden editörün içinde oynatma
 - Yüz ifadeli karakterler, dudak hareketi, kamera ve sahne geçişleri
 - Kaydetme, yükleme ve geri sarma her oyunda hazır

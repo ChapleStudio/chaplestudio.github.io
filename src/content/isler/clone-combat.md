@@ -1,11 +1,12 @@
 ---
 baslik: Clone Combat
 ozet: İki kişilik çevrimiçi platform nişancı. Her ölümünde hareketlerini tekrar eden bir hayalet bırakırsın.
-sahne: hayalet
+kisa: "Hayaletli çevrimiçi nişancı"
 kategori: oyun
-alt: cok-oyunculu
+sira: 1
 etiketler: [nisanci, platform2b, 2b, cevrimici, unity, netcode, unity-relay, csharp, bilgisayar]
-kapsam: 2
+afis: ../../assets/afisler/clone-combat.jpg
+gorunum: { zemin: "#f4ead6", yazi: "#14141c", vurgu: "#1b3fd6", vurguYazi: "#ffffff", tip: saira, en: 420, odak: 85, merkez: [66, 60] }
 baslangic: 2026-03-10
 guncelleme: 2026-03-15
 baglantilar:

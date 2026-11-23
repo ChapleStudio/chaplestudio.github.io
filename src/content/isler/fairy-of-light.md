@@ -1,12 +1,12 @@
 ---
 baslik: Fairy of Light
 ozet: Biri insanı, öteki uçan periyi oynayan iki kişinin aynı ağda iş birliğiyle oynadığı platform denemesi.
-sahne: peri
-tema: peri
+kisa: "İki kişilik iş birliği"
 kategori: oyun
-alt: cok-oyunculu
+sira: 2
 etiketler: [platform2b, 2b, yerel-ag, isbirligi, unity, netcode, csharp, bilgisayar]
-kapsam: 1
+afis: ../../assets/afisler/fairy-of-light.jpg
+gorunum: { zemin: "#12302a", yazi: "#eef3d2", vurgu: "#f6e3a1", vurguYazi: "#12302a", tip: caprasimo, odak: 76, merkez: [72, 45] }
 baslangic: 2026-03-10
 guncelleme: 2026-03-10
 baglantilar:

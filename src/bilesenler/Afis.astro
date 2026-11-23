@@ -1,0 +1,8 @@
+---
+import { Image } from 'astro:assets';
+import type { IsKaydi } from '../kutuphane/kayit';
+interface Props { kayit: IsKaydi; hemen?: boolean }
+const { kayit, hemen = false } = Astro.props;
+---
+{/* Bütün yerlerde aynı boy adayları kullanılır; dilimden sahneye geçerken resim yeniden inmez. */}
+<Image src={kayit.veri.afis} alt="" layout="none" widths={[960, 1440, 1920]} sizes="(min-width: 861px) max(100vw, 170vh), 160vw" quality={84} loading={hemen ? 'eager' : 'lazy'} fetchpriority={hemen ? 'high' : 'auto'} decoding="async" draggable="false" />

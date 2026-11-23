@@ -1,10 +1,12 @@
 ---
 baslik: PC-Eye
 ozet: Yapay zekâ ajanlarının Linux masaüstünü ekran görüntüsü tahmin etmeden görüp kullanmasını sağlayan araç.
-sahne: tarama
+kisa: "Ajanların masaüstü gözü"
 kategori: yapay-zeka
+sira: 1
 etiketler: [ajan-araci, ocr, yapay-zeka-modeli, mcp, wayland, onnx, rust, linux]
-kapsam: 3
+afis: ../../assets/afisler/pc-eye.jpg
+gorunum: { zemin: "#0f1b2d", yazi: "#dfeaf2", vurgu: "#f26b21", vurguYazi: "#0f1b2d", tip: krona, odak: 78, merkez: [68, 45] }
 baslangic: 2026-10-17
 guncelleme: 2026-11-21
 suruyor: true

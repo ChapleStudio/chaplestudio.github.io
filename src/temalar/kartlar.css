@@ -1,7 +1,0 @@
-/* Düğümün ağaçtaki yüzü. Her tema kendi renk ve çerçevesini verir; `--dal` sahnenin de rengidir. */
-/* Başka temanın odasında duran stüdyo düğümü kendi rengine döner. */
-[data-tema='studyo'] { --yuzey: #2c1b23; --yuzey-2: #3b2630; --cizgi: #66495a; --kemik: #f2e6da; --soluk: #c9b4b6; --sahne-zemin: #170e13; --kose: 14px 5px 12px 6px / 6px 13px 5px 14px; }
-[data-tema='rowl'] { --dal: #b79bff; --yuzey: #241a3d; --yuzey-2: #34265a; --cizgi: #5b4690; --soluk: #c9bce8; --sahne-zemin: #160f29; --kose: 4px; }
-.kart[data-tema='rowl'] { border-width: 2px; box-shadow: inset 0 0 0 4px #241a3d, inset 0 0 0 5px #5b4690; }
-.kart[data-tema='rowl'] .ad { margin: 0 6px 6px; }
-[data-tema='peri'] { --dal: #f2df7e; --yuzey: #1c3327; --yuzey-2: #284636; --cizgi: #4c7358; --soluk: #bcd3bd; --sahne-zemin: #0e2219; --kose: 46px 8px 46px 8px; }

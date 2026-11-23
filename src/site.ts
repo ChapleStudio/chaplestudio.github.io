@@ -4,6 +4,8 @@ export const site = {
   ad: 'Chaple Studio',
   aciklama: 'Yaptığım oyunlar, motorlar ve araçlar.',
   dil: 'tr',
+  /** Ana sayfa açılınca görünen iş (src/content/isler/ içindeki dosya adı). */
+  vitrin: 'rowl-engine',
 } as const;
 
 export interface Bolum {
@@ -35,7 +37,7 @@ export const bolumler: readonly Bolum[] = [
   },
 ];
 
-const ayrilmis = ['etiket', '404'];
+const ayrilmis = ['404', 'ilk', 'projeler'];
 for (const b of bolumler) if (ayrilmis.includes(b.id)) throw new Error(`"${b.id}" adı ayrılmış, bölüm adı olamaz`);
 
 export const acikBolumler = bolumler.filter((b) => b.acik);

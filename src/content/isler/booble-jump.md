@@ -1,11 +1,12 @@
 ---
 baslik: Booble Jump
 ozet: Telefonu sağa sola eğerek oynanan, rastgele platformlarla sonsuza kadar yükselen zıplama oyunu.
-sahne: ziplama
+kisa: "Telefonu eğ, zıpla"
 kategori: oyun
-alt: arcade
+sira: 3
 etiketler: [sonsuz-kosu, platform2b, 2b, hareket-algilayici, rastgele-uretim, unity, csharp, android]
-kapsam: 1
+afis: ../../assets/afisler/booble-jump.jpg
+gorunum: { zemin: "#f7c331", yazi: "#1b2a49", vurgu: "#1b2a49", vurguYazi: "#ffffff", tip: chango, odak: 74, merkez: [70, 45] }
 baslangic: 2026-02-23
 guncelleme: 2026-03-09
 baglantilar:
