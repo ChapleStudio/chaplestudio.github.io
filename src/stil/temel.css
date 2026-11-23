@@ -92,4 +92,4 @@ figure + .yazi { margin-top: 3rem; }
 .kart .alt { display: block; color: var(--soluk); font-size: 0.9rem; line-height: 1.35; margin-top: 0.25rem; }
 .kart .suruyor { position: absolute; right: 0.8rem; top: 0.8rem; width: 0.65rem; height: 0.65rem; border-radius: 50%; background: var(--dal); box-shadow: 0 0 0 4px #0b0b0b99; }
 
-@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation-duration: 0.01ms !important; } }
