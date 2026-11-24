@@ -25,7 +25,7 @@ Ana sayfa, liste, RSS ve site haritası kendiliğinden güncellenir. Eksik ya da
 
 **Kendi sitesi olan proje:** hazır siteyi `public/<yol>/` klasörüne koy, içeriğe `kendiSitesi: /<yol>/` yaz. İçine girilince o site açılır. O sitede dönüş için `/#isler/<dosya-adı>` bağlantısı yeter.
 
-**Calradya Kodeksi** (`public/bannerlord/`) elle düzenlenmez: `python3 araclar/kodeks-al.py <bannerlord deposu>` üretir. İndirme düğmesi yalnız özel linkle açılır; dosya değişince `araclar/kodeks-indirme.json` içindeki özet, boy ve SHA-256 güncellenir. Dosya kimliği bu depoya yazılmaz.
+**Calradia** (`public/bannerlord/`) elle düzenlenmez: `python3 araclar/kodeks-al.py <bannerlord deposu>` üretir. İndirme düğmesi yalnız özel linkle açılır; dosya değişince `araclar/kodeks-indirme.json` içindeki özet, boy ve SHA-256 güncellenir. Dosya kimliği bu depoya yazılmaz.
 
 ## Kategori ve etiket
 

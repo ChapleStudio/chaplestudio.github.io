@@ -5,7 +5,7 @@ export const site = {
   aciklama: 'Yaptığım oyunlar, motorlar ve araçlar.',
   dil: 'tr',
   /** Ana sayfa açılınca görünen iş (src/content/isler/ içindeki dosya adı). */
-  vitrin: 'rowl-engine',
+  vitrin: 'calradia',
 } as const;
 
 export interface Bolum {

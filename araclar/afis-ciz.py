@@ -425,8 +425,8 @@ def rowlag():
     return o
 A['rowl-agac']=rowlag
 
-# ---------- KODEKS: sancaktar ve kitabı taşıyan çırağı
-def kodeks():
+# ---------- CALRADIA: sancaktar ve kitabı taşıyan çırağı
+def calradia():
     ink='#2b2019'; kir='#a3271c'; lap='#22407a'; alt='#d9a441'; vel='#efe4cb'; kum='#dcc595'
     o=r(0,0,W,H,vel)+c(1500,430,330,'#e0a94a')
     # uzak tepeler ve kale
@@ -473,7 +473,7 @@ def kodeks():
     ck+=p('M24 6 L52 -30 L44 -70','none',st('#3e6b57',16))+p('M-12 8 L-40 -28 L-38 -66','none',st('#3e6b57',16))
     o+=g(ck,'translate(1046 628)')
     return o
-A['calradya-kodeksi']=kodeks
+A['calradia']=calradia
 
 DEF='''<filter id="kes" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="5" xChannelSelector="R" yChannelSelector="G"/></filter>
 <filter id="gr" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="3"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1.1 -0.42"/></filter>'''

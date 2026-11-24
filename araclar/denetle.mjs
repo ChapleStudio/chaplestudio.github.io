@@ -164,8 +164,8 @@ for (const [ad, gorunum] of [['masaüstü', { width: 1440, height: 900 }], ['tel
   await t.focus('[data-kategori=arac]');
   await bekle(400);
   if (JSON.stringify(await durum()) !== once) sorun(y, 'üstüne gelince değişti');
-  await oynamali('kategori açılışı', '[data-kategori=oyun]', '.dilim');
-  if ((await durum()).kat !== 'oyun') sorun(y, 'kategori açılmadı');
+  // site her açılışta vitrin projesiyle ve kendi kategorisinin dilimleri açık gelir
+  if ((await durum()).kat !== 'oyun' || (await durum()).secili !== 'calradia') sorun(y, 'açılışta Oyunlar dilimleri ve vitrin proje açık değil');
   await oynamali('açıkken başka kategori', '[data-kategori=arac]', '.dilim');
   await oynamali('açıkken üçüncü kategori', '[data-kategori=yapay-zeka]', '.dilim');
   await oynamali('kategoriyi kapatma', '[data-kategori=yapay-zeka]', '.dilim');
@@ -229,7 +229,7 @@ for (const [ad, gorunum] of [['masaüstü', { width: 1440, height: 900 }], ['tel
     window.__yanlis = 0;
     const bak = () => {
       const s = document.querySelector('.soz:not([hidden])');
-      if (s && s.dataset.soz !== 'snowdesk' && s.checkVisibility({ visibilityProperty: true })) window.__yanlis++;
+      if (s && s.dataset.soz !== 'calradia' && s.checkVisibility({ visibilityProperty: true })) window.__yanlis++;
       if (performance.now() < 2500) requestAnimationFrame(bak);
     };
     requestAnimationFrame(bak);
@@ -237,8 +237,8 @@ for (const [ad, gorunum] of [['masaüstü', { width: 1440, height: 900 }], ['tel
   await t.goto(`${taban}/#isler/snowdesk`, { waitUntil: 'load' });
   await bekle(2600);
   const yanlis = await t.evaluate(() => window.__yanlis);
-  if (yanlis) sorun('/#isler/snowdesk', `${yanlis} karede yanlış proje göründü`);
-  if (!(await t.evaluate(() => document.querySelector('[data-soz=snowdesk]').checkVisibility({ visibilityProperty: true })))) sorun('/#isler/snowdesk', 'proje görünmedi');
+  if (yanlis) sorun('/#isler/snowdesk (adres yok sayılır)', `${yanlis} karede yanlış proje göründü`);
+  if (!(await t.evaluate(() => document.querySelector('[data-soz=calradia]').checkVisibility({ visibilityProperty: true })))) sorun('/#isler/snowdesk (adres yok sayılır)', 'vitrin proje görünmedi');
   await t.close();
   const b = await hareketli.newPage();
   await b.setJavaScriptEnabled(false);

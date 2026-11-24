@@ -190,8 +190,11 @@ function adrestenOku() {
     grubuIsaretle(kumesi.get(id)!);
   }
 }
-adrestenOku();
+const donuyor = sessionStorage.getItem(DONUS) !== null;
+// Taze açılışta adresteki seçim yok sayılır: site hep vitrin projesi ve kendi kategorisinin dilimleriyle açılır.
+if (donuyor) adrestenOku();
 document.documentElement.classList.remove('bekle');
+if (!donuyor) kategoriAc(kumesi.get(secili)!);
 // Proje sayfası "buradan girildi" notunu dönüşte yerine getirir.
 if (sessionStorage.getItem(DONUS) === secili && performance.getEntriesByType('navigation')[0] instanceof PerformanceNavigationTiming) donus();
 sessionStorage.removeItem(DONUS);

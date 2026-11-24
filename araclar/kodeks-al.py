@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Calradya Kodeksi'ni public/bannerlord/ içine alır.
+"""Calradia'yı public/bannerlord/ içine alır.
 
 Kullanım: python3 araclar/kodeks-al.py <bannerlord deposunun yolu>
 
@@ -80,8 +80,10 @@ sayfa = sayfa.replace('<meta charset="utf-8">', f'<meta charset="utf-8">\n<meta 
 sayfa = sayfa.replace('content="assets/san-romano.webp"', 'content="https://chaplestudio.github.io/bannerlord/assets/san-romano.webp"')
 sayfa = sayfa.replace('<meta name="theme-color"', '<link rel="canonical" href="https://chaplestudio.github.io/bannerlord/">\n<meta name="theme-color"', 1)
 sayfa = sayfa.replace(' onsubmit="return false"', "")
-sayfa = sayfa.replace('<a class="wordmark"', '<a class="donus" href="/#isler/calradya-kodeksi" aria-label="Chaple Studio, bütün projeler">←</a>\n  <a class="wordmark"', 1)
+sayfa = sayfa.replace('<a class="wordmark"', '<a class="donus" href="/#isler/calradia" aria-label="Chaple Studio, bütün projeler">←</a>\n  <a class="wordmark"', 1)
 sayfa = sayfa.replace('<li><a href="#bolumler">', '<li><a href="#indir">Kur</a></li>\n      <li><a href="#bolumler">', 1)
+
+sayfa = sayfa.replace("Calradya Kodeksi", "Calradia").replace("Bu kodekste", "Bu kitapta")
 
 # satır içi renk → sınıf
 renkler = {}
