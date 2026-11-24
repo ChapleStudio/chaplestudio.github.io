@@ -17,6 +17,7 @@ export const tipler = {
   fredoka: { aile: 'Fredoka', kalin: 700, ara: '-0.03em', boy: 138 },
   abril: { aile: 'Abril Fatface', kalin: 400, ara: '-0.015em', boy: 104 },
   grandstander: { aile: 'Grandstander', kalin: 800, ara: '-0.02em', boy: 104 },
+  grenze: { aile: 'Grenze Gotisch', kalin: 700, ara: '0', boy: 128 },
   hanken: { aile: 'Hanken Grotesk Variable', kalin: 800, ara: '-0.035em', boy: 112 },
 } as const satisfies Record<string, { aile: string; kalin: number; ara: string; boy: number }>;
 

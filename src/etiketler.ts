@@ -19,6 +19,7 @@ const sozluk = {
   platform2b: ['tur', 'Platform oyunu'],
   'gorsel-roman': ['tur', 'Görsel roman'],
   'oyun-motoru': ['tur', 'Oyun motoru'],
+  'mod-paketi': ['tur', 'Mod paketi'],
   'unity-paketi': ['tur', 'Unity paketi'],
   'ajan-araci': ['tur', 'Ajan aracı'],
   'ses-ayirma': ['tur', 'Ses ayırma'],
