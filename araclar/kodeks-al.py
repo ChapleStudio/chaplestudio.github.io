@@ -25,8 +25,8 @@ veri = k.parse(k.find_guide())
 
 # --- kurulum bölümü
 ind = json.loads((kok / "araclar" / "kodeks-indirme.json").read_text(encoding="utf-8"))
-dugme = f'''<p class="front-links" id="indirDugme" data-ozet="{E(ind["kimlikOzeti"] or "")}" hidden><a class="button" href="#indir" rel="noopener noreferrer">Paketi indir ({E(ind["boy"])})</a></p>
-  <p class="pending" id="indirYok">Paket arkadaşlara özel. İndirme düğmesi, sana gönderilen linkle açınca çıkar.</p>'''
+drive_url = f"https://drive.usercontent.google.com/download?id={ind['kimlik']}&export=download&confirm=t"
+dugme = f'''<p class="front-links" id="indirDugme"><a class="button" href="{E(drive_url)}" rel="noopener noreferrer">Paketi indir ({E(ind["boy"])})</a></p>'''
 kunye = "".join(f"<div><dt>{E(a)}</dt><dd>{d}</dd></div>" for a, d in [
     ("Sürüm", f'{E(ind["surum"])}, deneme sürümü'),
     ("İnen dosya", f'<code>{E(ind["dosya"])}</code>, {E(ind["boy"])}'),
@@ -62,7 +62,7 @@ indir = f"""
 
 # --- gövde
 front = k.render_front(veri).replace("Linux, Proton", "Windows ve Linux")
-front = front.replace('<a class="button" href="#bolumler">Modları oku</a>', '<a class="button" href="#indir">Paketi kur</a> <a class="button quiet" href="#bolumler">Modları oku</a>')
+front = front.replace('<a class="button" href="#bolumler">Modları oku</a>', '<a class="button" id="paketiKurBtn" href="#indir">Paketi kur</a> <a class="button quiet" href="#bolumler">Modları oku</a>')
 sayfa = (k.SRC / "index.html").read_text(encoding="utf-8")
 for ad, deger in {
     "{{FRONT}}": front, "{{INTRO}}": k.render_intro(veri) + indir, "{{WORKS}}": k.render_works(veri),
@@ -101,24 +101,28 @@ if "q.form.addEventListener" not in betik:
     sys.exit("app.js değişmiş, form yakalanamadı")
 
 betik += """
-/* ---------- özel linkle indirme: yalnız özeti tutan dosya kimliği düğmeyi açar ---------- */
+/* ---------- doğrudan indirme: "Paketi kur" tıklandığında indirir ve talimatlara kaydırır ---------- */
 (() => {
   "use strict";
-  const kutu = document.getElementById("indirDugme"), yok = document.getElementById("indirYok");
-  const dene = async (kimlik, kaydir) => {
-    if (!/^[\\w-]{20,80}$/.test(kimlik || "") || !kutu.dataset.ozet || !globalThis.crypto?.subtle) return;
-    const ozet = [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(kimlik)))].map(b => b.toString(16).padStart(2, "0")).join("");
-    if (ozet !== kutu.dataset.ozet) return;
-    kutu.firstElementChild.href = "https://drive.usercontent.google.com/download?id=" + kimlik + "&export=download&confirm=t";
-    kutu.hidden = false;
-    yok.hidden = true;
-    try { sessionStorage.setItem("kodeks-indir", kimlik); } catch {}
-    if (kaydir) document.getElementById("indir").scrollIntoView();
+  const kurBtn = document.getElementById("paketiKurBtn");
+  const indirBtn = document.querySelector("#indirDugme a[href]");
+  if (kurBtn && indirBtn) {
+    kurBtn.addEventListener("click", () => {
+      const a = document.createElement("a");
+      a.href = indirBtn.href;
+      a.rel = "noopener noreferrer";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    });
+  }
+  const kaydir = () => {
+    if (/^#indir(=|$)/.test(location.hash)) {
+      document.getElementById("indir")?.scrollIntoView();
+    }
   };
-  const oku = () => dene(location.hash.match(/^#indir=(.+)$/)?.[1], true);
-  addEventListener("hashchange", oku);
-  try { dene(sessionStorage.getItem("kodeks-indir"), false); } catch {}
-  oku();
+  addEventListener("hashchange", kaydir);
+  kaydir();
 })();
 """
 
@@ -164,4 +168,4 @@ for g in {a["file"] for a in k.ART.values()}:
 (cikti / "kodeks.css").write_text(stil, encoding="utf-8")
 (cikti / "kodeks.js").write_text(betik, encoding="utf-8")
 (cikti / "ilk.js").write_text('document.documentElement.classList.add("js");\n', encoding="utf-8")
-print(f"{len(veri['mods'])} anlatım, {len(sayfa) // 1024} KB, indirme: {'özel link' if ind['kimlikOzeti'] else 'kapalı'}")
+print(f"{len(veri['mods'])} anlatım, {len(sayfa) // 1024} KB, indirme: {'açık' if ind.get('kimlik') else 'kapalı'}")

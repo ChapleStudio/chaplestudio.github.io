@@ -204,22 +204,26 @@
   fromHash();
 })();
 
-/* ---------- özel linkle indirme: yalnız özeti tutan dosya kimliği düğmeyi açar ---------- */
+/* ---------- doğrudan indirme: "Paketi kur" tıklandığında indirir ve talimatlara kaydırır ---------- */
 (() => {
   "use strict";
-  const kutu = document.getElementById("indirDugme"), yok = document.getElementById("indirYok");
-  const dene = async (kimlik, kaydir) => {
-    if (!/^[\w-]{20,80}$/.test(kimlik || "") || !kutu.dataset.ozet || !globalThis.crypto?.subtle) return;
-    const ozet = [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(kimlik)))].map(b => b.toString(16).padStart(2, "0")).join("");
-    if (ozet !== kutu.dataset.ozet) return;
-    kutu.firstElementChild.href = "https://drive.usercontent.google.com/download?id=" + kimlik + "&export=download&confirm=t";
-    kutu.hidden = false;
-    yok.hidden = true;
-    try { sessionStorage.setItem("kodeks-indir", kimlik); } catch {}
-    if (kaydir) document.getElementById("indir").scrollIntoView();
+  const kurBtn = document.getElementById("paketiKurBtn");
+  const indirBtn = document.querySelector("#indirDugme a[href]");
+  if (kurBtn && indirBtn) {
+    kurBtn.addEventListener("click", () => {
+      const a = document.createElement("a");
+      a.href = indirBtn.href;
+      a.rel = "noopener noreferrer";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    });
+  }
+  const kaydir = () => {
+    if (/^#indir(=|$)/.test(location.hash)) {
+      document.getElementById("indir")?.scrollIntoView();
+    }
   };
-  const oku = () => dene(location.hash.match(/^#indir=(.+)$/)?.[1], true);
-  addEventListener("hashchange", oku);
-  try { dene(sessionStorage.getItem("kodeks-indir"), false); } catch {}
-  oku();
+  addEventListener("hashchange", kaydir);
+  kaydir();
 })();
