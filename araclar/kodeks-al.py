@@ -26,7 +26,7 @@ veri = k.parse(k.find_guide())
 # --- kurulum bölümü
 ind = json.loads((kok / "araclar" / "kodeks-indirme.json").read_text(encoding="utf-8"))
 drive_url = f"https://drive.usercontent.google.com/download?id={ind['kimlik']}&export=download&confirm=t"
-dugme = f'''<p class="front-links" id="indirDugme"><a class="button" href="{E(drive_url)}" rel="noopener noreferrer">Paketi indir ({E(ind["boy"])})</a></p>'''
+dugme = f'''<p class="front-links" id="indirDugme"><a class="button" href="{E(drive_url)}" target="_blank" rel="noopener noreferrer">Paketi indir ({E(ind["boy"])})</a></p>'''
 kunye = "".join(f"<div><dt>{E(a)}</dt><dd>{d}</dd></div>" for a, d in [
     ("Sürüm", f'{E(ind["surum"])}, deneme sürümü'),
     ("İnen dosya", f'<code>{E(ind["dosya"])}</code>, {E(ind["boy"])}'),
@@ -110,6 +110,7 @@ betik += """
     kurBtn.addEventListener("click", () => {
       const a = document.createElement("a");
       a.href = indirBtn.href;
+      a.target = "_blank";
       a.rel = "noopener noreferrer";
       document.body.appendChild(a);
       a.click();
